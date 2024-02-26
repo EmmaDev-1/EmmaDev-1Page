@@ -1,0 +1,38 @@
+/* Estilos para el contenedor de previsualización */
+#previsualizacion {
+    position: relative;
+    width: 20%;
+}
+
+/* Estilos para el iframe de previsualización */
+#documento {
+    width: 600px;
+    height: 800px;
+}
+
+/* Estilos para el botón de descarga */
+#botonDescargar {
+    
+    align-items: center;
+    position: absolute;
+    top: 10px; /* Ajusta la posición vertical según sea necesario */
+    left: 10px; /* Ajusta la posición horizontal según sea necesario */
+    background-color: #007bff; /* Color de fondo del botón */
+    color: #fff; /* Color del texto del botón */
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 5px;
+    display: none; /* Inicialmente oculto */
+}
+#imagen {
+    width: 300px;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease; /* Agregar transición para la propiedad transform */
+}
+
+#imagen:active {
+    transform: scale(0.9); /* Escala la imagen al 90% cuando se presiona (active) */
+}
