@@ -231,7 +231,7 @@ section.projects {
   overflow: hidden;
   background-color: #151515;
   color: #fff;
-  height: 306vh;
+  height: 410vh;
   text-align: center;
   font-size: 120%;
   margin-bottom: 10%;
@@ -359,11 +359,11 @@ section.curriculumContainer {
 }
 
 .columnAboutMe.show {
-  animation: blobAnimation 3s infinite alternate ease-in-out, slideAndBounceRight 4s ease-out forwards;
+  animation: blobAnimation 1s infinite alternate ease-in-out, slideAndBounceRight 2s ease-out forwards;
 }
 
 .columnAboutMe2.show {
-  animation: slideAndBounceLeft 3.5s ease-out forwards;
+  animation: slideAndBounceLeft 2s ease-out forwards;
 }
 
 
@@ -389,7 +389,7 @@ section.curriculumContainer {
 
 @keyframes slideAndBounceRight {
   0% {
-    transform: translateX(180%);
+    transform: translateX(70%);
   }
 
   60% {
@@ -415,7 +415,7 @@ section.curriculumContainer {
 
 @keyframes slideAndBounceLeft {
   0% {
-    transform: translateX(-100%);
+    transform: translateX(-30%);
   }
 
   60% {
