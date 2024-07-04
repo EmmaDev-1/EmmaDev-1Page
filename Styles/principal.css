@@ -16,15 +16,6 @@ html {
   scroll-behavior: smooth;
 }
 
-@keyframes animationgradienttitle {
-  0% {
-    background-position: 0 1600px;
-  }
-
-  100% {
-    background-position: 1600px 0;
-  }
-}
 
 .circle {
   height: 24px;
@@ -91,9 +82,9 @@ li {
 }
 
 /*--------------------------------------------------------------
-# Button Home Efect
+# Button Navigation Efect
 --------------------------------------------------------------*/
-.btn-home {
+.btn-nav {
   position: relative;
   display: inline-block;
   padding: 10px 20px;
@@ -107,102 +98,7 @@ li {
   border-radius: 30px;
 }
 
-.btn-home:hover {
-  background: #a945c7;
-  box-shadow: 0 0 10px #a945c7, 0 0 40px #a945c7, 0 0 80px #a945c7;
-  transition: 0.8s ease;
-}
-
-/*--------------------------------------------------------------
-# Button About Me Efect
---------------------------------------------------------------*/
-.btn-aboutMe {
-  position: relative;
-  display: inline-block;
-  padding: 10px 20px;
-  color: #fff;
-  letter-spacing: 2px;
-  font-size: 20px;
-  font-weight: bolder;
-  text-decoration: none;
-  overflow: hidden;
-  transition: 0.2s;
-  border-radius: 30px;
-}
-
-.btn-aboutMe:hover {
-  background: #a945c7;
-  box-shadow: 0 0 10px #a945c7, 0 0 40px #a945c7, 0 0 80px #a945c7;
-  transition: 0.8s ease;
-}
-
-
-/*--------------------------------------------------------------
-# Button Projects Efect
---------------------------------------------------------------*/
-.btn-projects {
-  position: relative;
-  display: inline-block;
-  padding: 10px 20px;
-  color: #fff;
-  letter-spacing: 2px;
-  font-size: 20px;
-  font-weight: bolder;
-  text-decoration: none;
-  overflow: hidden;
-  transition: 0.2s;
-  border-radius: 30px;
-}
-
-.btn-projects:hover {
-  background: #a945c7;
-  box-shadow: 0 0 10px #a945c7, 0 0 40px #a945c7, 0 0 80px #a945c7;
-  transition: 0.8s ease;
-}
-
-
-/*--------------------------------------------------------------
-# Button Skill Efect
---------------------------------------------------------------*/
-.btn-skill {
-  position: relative;
-  display: inline-block;
-  padding: 10px 20px;
-  color: #fff;
-  letter-spacing: 2px;
-  font-size: 20px;
-  font-weight: bolder;
-  text-decoration: none;
-  overflow: hidden;
-  transition: 0.2s;
-  border-radius: 30px;
-}
-
-.btn-skill:hover {
-  background: #a945c7;
-  box-shadow: 0 0 10px #a945c7, 0 0 40px #a945c7, 0 0 80px #a945c7;
-  transition: 0.8s ease;
-}
-
-
-/*--------------------------------------------------------------
-# Button Curriculum Efect
---------------------------------------------------------------*/
-.btn-curriculum {
-  position: relative;
-  display: inline-block;
-  padding: 10px 20px;
-  color: #fff;
-  letter-spacing: 2px;
-  font-size: 20px;
-  font-weight: bolder;
-  text-decoration: none;
-  overflow: hidden;
-  transition: 0.2s;
-  border-radius: 30px;
-}
-
-.btn-curriculum:hover {
+.btn-nav:hover {
   background: #a945c7;
   box-shadow: 0 0 10px #a945c7, 0 0 40px #a945c7, 0 0 80px #a945c7;
   transition: 0.8s ease;
@@ -231,7 +127,7 @@ section.projects {
   overflow: hidden;
   background-color: #151515;
   color: #fff;
-  height: 520vh;
+  height: 620vh;
   text-align: center;
   font-size: 120%;
   margin-bottom: 10%;
@@ -311,6 +207,16 @@ section.curriculumContainer {
   filter: brightness(2);
 }
 
+@keyframes animationgradienttitle {
+  0% {
+    background-position: 0 1600px;
+  }
+
+  100% {
+    background-position: 1600px 0;
+  }
+}
+
 /*--------------------------------------------------------------
 # About Me Section
 --------------------------------------------------------------*/
@@ -359,7 +265,7 @@ section.curriculumContainer {
 }
 
 .columnAboutMe.show {
-  animation: blobAnimation 1s infinite alternate ease-in-out, slideAndBounceRight 2s ease-out forwards;
+  animation: slideAndBounceRight 2s ease-out forwards, blobAnimation 1s infinite alternate ease-in-out;
 }
 
 .columnAboutMe2.show {
@@ -389,7 +295,7 @@ section.curriculumContainer {
 
 @keyframes slideAndBounceRight {
   0% {
-    transform: translateX(70%);
+    transform: translateX(30%);
   }
 
   60% {
