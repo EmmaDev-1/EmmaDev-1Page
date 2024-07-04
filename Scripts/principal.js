@@ -33,18 +33,11 @@ const colors = [
   "#B55CCF",
   "#B55CCF",
   "#BB67D3",
-  "#BB67D3",
-  "#C172D7",
   "#C172D7",
   "#CE7FE4",
-  "#CE7FE4",
-  "#D689EC",
   "#D689EC",
   "#DF90F6",
-  "#DF90F6",
   "#E19CF5",
-  "#E19CF5",
-  "#E2A9F2",
   "#E2A9F2"
 ];
 
@@ -175,4 +168,4 @@ function changeImageWithTransition() {
 changeImageWithTransition();
 
 // Llama a la función changeImageWithTransition() cada 3 segundos
-setInterval(changeImageWithTransition, 4000); // Intervalo de cambio de imagen cada 3 segundos
+setInterval(changeImageWithTransition, 3000); // Intervalo de cambio de imagen cada 3 segundos
