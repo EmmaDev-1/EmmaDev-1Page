@@ -10,6 +10,7 @@
   <link rel="icon" href="Images/aboutMe/EmmaDevAnimated2.jpeg" type="image/x-icon">
   <link rel="stylesheet" href="Styles/principal.css">
   <link rel="stylesheet" href="Styles/mobileMediaQuery.css">
+  <link rel="stylesheet" href="Styles/navBarResponsive.css">
   <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
 
 </head>
@@ -22,54 +23,24 @@
     <section id="homeId" class="home">
       <!-- ===== Header ===== -->
       <header id="header">
-
+        
         <div class="navigation">
-
-          <nav id="navbar" class="navbar">
-            <ul>
-              <li><a href="#homeId" class="btn-nav">
-                  <span id="home-span1"></span>
-                  <span id="home-span2"></span>
-                  <span id="home-span3"></span>
-                  <span id="home-span4"></span>
-                  Home
-                </a></li>
-              <li><a href="#aboutMeId" class="btn-nav">
-                  <span id="aboutMe-span1"></span>
-                  <span id="aboutMe-span2"></span>
-                  <span id="aboutMe-span3"></span>
-                  <span id="aboutMe-span4"></span>
-                  About Me
-                </a></li>
-              <li><a href="#projectsId" class="btn-nav">
-                  <span id="projects-span1"></span>
-                  <span id="projects-span2"></span>
-                  <span id="projects-span3"></span>
-                  <span id="projects-span4"></span>
-                  Projects
-                </a></li>
-              <li><a href="#skillId" class="btn-nav">
-                  <span id="skill-span1"></span>
-                  <span id="skill-span2"></span>
-                  <span id="skill-span3"></span>
-                  <span id="skill-span4"></span>
-                  Experience
-                </a></li>
-              <li><a href="#curriculumId" class="btn-nav">
-                  <span id="curriculum-span1"></span>
-                  <span id="curriculum-span2"></span>
-                  <span id="curriculum-span3"></span>
-                  <span id="curriculum-span4"></span>
-                  Curriculum
-                </a></li>
-            </ul>
-          </nav>
-
-
+            
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a href="#homeId" class="btn-nav">Home</a></li>
+                    <li><a href="#aboutMeId" class="btn-nav">About Me</a></li>
+                    <li><a href="#projectsId" class="btn-nav">Projects</a></li>
+                    <li><a href="#skillId" class="btn-nav">Experience</a></li>
+                    <li><a href="#curriculumId" class="btn-nav">Curriculum</a></li>
+                </ul>
+            </nav>
         </div>
-
-      </header>
+    </header>
       <!-- ===== End Header ===== -->
+
+      
+
 
       <div class="homeContainer">
         <h2 class="homeTitulo">Hi, I'm Emmanuel a Software Engineer</h2>
@@ -306,12 +277,44 @@
   </div>
   <!-- ===== End Arrow ===== -->
 
+  
+  <!-- ===== Nav Menu ===== -->
+  <div class="navbar-toggle" id="navbar-toggle">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </div>
+
+  <div class="nav-panel" id="nav-panel">
+    <div class="panel-close" id="panel-close">&times;</div>
+    <ul>
+        <li><a href="#homeId" class="btn-nav">Home</a></li>
+        <li><a href="#aboutMeId" class="btn-nav">About Me</a></li>
+        <li><a href="#projectsId" class="btn-nav">Projects</a></li>
+        <li><a href="#skillId" class="btn-nav">Experience</a></li>
+        <li><a href="#curriculumId" class="btn-nav">Curriculum</a></li>
+    </ul>
+    <div class="social-icons">
+      <a href="https://www.linkedin.com/in/dev-emma1" target="_blank">
+        <img src="Images\icons/linkedin.png">
+      </a>
+      <a href="https://github.com/EmmaDev-1" target="_blank">
+        <img src="Images\icons/github.png" alt="GitHub">
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== End Nav Menu ===== -->
+
+
+
 
 
 
 
   <!-- ===== Scripts Section ===== -->
   <script defer src="Scripts/principal.js"></script>
+  <script defer src="Scripts/navBarResponsive.js"></script>
 
 </body>
 

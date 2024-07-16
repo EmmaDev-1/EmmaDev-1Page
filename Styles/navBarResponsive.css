@@ -1,0 +1,9 @@
+@media (max-width: 767px) {
+    .navbar-toggle {
+        display: flex;
+    }
+
+    .navbar {
+        display: none;
+    }
+}
