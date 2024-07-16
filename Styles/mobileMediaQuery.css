@@ -9,8 +9,7 @@
 
     .btn-home,
     .btn-aboutMe,
-    .btn-skill,
-    .btn-curriculum {
+    .btn-skill {
         font-size: 16px;
         /* Reduce el tamaño del texto */
         padding: 8px 16px;
@@ -129,14 +128,30 @@
         margin-bottom: 10%;
       }
 
+      .curriculumContainer {
+        display: flex;
+        background-color: #151515;
+        color: #fff;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .curriculumContainer h2 {
+        margin-top: 0;
+        text-align: center;
+      }
+
+
+      
       .resumeContainer {
         margin-top: 1%;
         display: flex;
         position: relative;
         justify-content: center;
         align-items: center;
-        width: 400px;
-        height: auto;
+        width: 310px;
+        height: 383px;
         border-radius: 20px;
         background: #151515;
         opacity: 0;
@@ -144,6 +159,60 @@
         transform: translateX(0%);
         transition: all 3.5s;
         overflow: hidden;
+      }
+      
+      
+      .resumeContainer a {
+        width: 600px;
+        display: flex;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+        border-radius: 20px;
+        text-align: center;
+        overflow: hidden;
+      }
+      
+      .curriculumContainer a:hover {
+        transform: translateY(0px);
+        filter: blur(0.8px);
+      }
+      
+      .curriculumContainer img {
+        max-width: 97%;
+        height: auto;
+        border-radius: 20px;
+        z-index: 2;
+        padding-left: 4px;
+      }
+      
+      .resumeContainer::before {
+        content: '';
+        position: absolute;
+        width: 250%;
+        height: 40%;
+        background: linear-gradient(#a945c7, #FF6237, #AE4FCA);
+        animation: rotate 4s linear infinite;
+        border-radius: 20px;
+      }
+      
+      .resumeContainer.show {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateX(0);
+      }
+      
+      .resumeContainer a:hover {
+        transform: translateY(-4px);
+        filter: blur(0.8px);
+      }
+      
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+      
+        to {
+          transform: rotate(360deg);
+        }
       }
 
 
