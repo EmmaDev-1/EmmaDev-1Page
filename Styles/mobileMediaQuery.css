@@ -1,7 +1,7 @@
 /* Media Query para Tablets */
 @media (max-width: 768px) {
 
-    .columnProjects,
+
     .columnAboutMe {
         flex: 1 0 100%;
         /* Cambia a una columna */
@@ -9,7 +9,6 @@
 
     .btn-home,
     .btn-aboutMe,
-    .btn-projects,
     .btn-skill,
     .btn-curriculum {
         font-size: 16px;
@@ -18,8 +17,7 @@
         /* Ajusta el relleno */
     }
 
-    .blob-image,
-    .columnProjects img {
+    .blob-image{
         width: 90%;
         /* Ajusta el ancho de las imágenes */
         height: auto;
@@ -29,12 +27,12 @@
 
 /* Media Query para Móviles */
 @media (max-width: 480px) {
-    .navigation li {
-        padding-bottom: 10%;
-        /* Reduce el espacio entre elementos de la navegación */
-        font-size: 100%;
-        /* Ajusta el tamaño del texto */
+
+
+    .homeTitulo{
+        margin-top: 250px;
     }
+
 
     .homeTitulo,
     .titleProject {
@@ -66,24 +64,87 @@
     .titleProject {
         font-size: 130%;
     }
+    
+
+    section.projects {
+        overflow: hidden;
+        background-color: #151515;
+        color: #fff;
+        height: 690vh;
+        text-align: center;
+        font-size: 120%;
+        margin-bottom: 10%;
+      }
 
     .mainColumnProjects {
-        height: 102vh;
-        max-width: 90%;
-    }
-
-    .columnProjects {
-        display: flex;
         flex-direction: column;
-        /* Asegura que los elementos internos se apilen verticalmente */
         align-items: center;
-        /* Centra los elementos horizontalmente */
+        height: auto;
+        margin-top: 100px;
+        margin-bottom: 100px;
+      }
+    
+      .columnProjects {
+        padding-bottom: 10px;
+        flex-direction: column;
         width: 100%;
-        /* Opcional, dependiendo del diseño deseado */
-        padding: 20px;
-        /* Añade algo de espacio alrededor del contenido */
-        box-sizing: border-box;
-        /* Asegura que el padding no afecte el ancho total */
-    }
+        max-width: 90%;
+      }
+    
+      .columnProjects img {
+        max-width: 70%;
+        height: auto;
+      }
+
+
+    .circle {
+        height: 0px;
+        width: 0px;
+      }
+
+      .fixed-arrow {
+        display: none;
+      }
+
+      .carousel-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+    
+      .card {
+        flex: 0 0 80%; /* Adjust card size for mobile view */
+        height: auto; /* Allow height to adjust based on content */
+      }
+    
+      .prev,
+      .next {
+        display: none; /* Hide navigation buttons on mobile */
+      }
+
+      section.skillContainer {
+        overflow: hidden;
+        height: 400vh;
+        background-color: #151515;
+        color: #ffffff;
+        margin-bottom: 10%;
+      }
+
+      .resumeContainer {
+        margin-top: 1%;
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+        width: 400px;
+        height: auto;
+        border-radius: 20px;
+        background: #151515;
+        opacity: 0;
+        filter: blur(5px);
+        transform: translateX(0%);
+        transition: all 3.5s;
+        overflow: hidden;
+      }
+
 
 }

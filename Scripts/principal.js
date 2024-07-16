@@ -169,3 +169,5 @@ changeImageWithTransition();
 
 // Llama a la función changeImageWithTransition() cada 3 segundos
 setInterval(changeImageWithTransition, 3000); // Intervalo de cambio de imagen cada 3 segundos
+
+
