@@ -174,7 +174,7 @@ li {
 .social-icons {
   display: flex;
   justify-content: center;
-  padding-top: 300px;
+  padding-top: 250px;
   
   padding-left: 20px;
 }
@@ -221,7 +221,7 @@ section.projects {
   overflow: hidden;
   background-color: #151515;
   color: #fff;
-  height: 620vh;
+  height: 720vh;
   text-align: center;
   font-size: 120%;
   margin-bottom: 10%;
@@ -249,7 +249,7 @@ section.curriculumContainer {
 --------------------------------------------------------------*/
 
 .homeContainer {
-  padding-top: 6%;
+  padding-top: 10%;
   text-align: center;
   font-size: 200%;
   color: rgb(233, 233, 233);
@@ -478,6 +478,12 @@ section.curriculumContainer {
 }
 
 #imgOsc {
+  max-width: 110%;
+  height: 50%;
+  transition: opacity 0.5s ease-in-out;
+}
+
+#imgPadi {
   max-width: 110%;
   height: 50%;
   transition: opacity 0.5s ease-in-out;
