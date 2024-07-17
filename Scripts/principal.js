@@ -171,3 +171,48 @@ changeImageWithTransition();
 setInterval(changeImageWithTransition, 3000); // Intervalo de cambio de imagen cada 3 segundos
 
 
+// Lista de las URLs de las imágenes
+var imageUrlsPadi = [
+  "Images/projects/CasaPadi/1.png",
+  "Images/projects/CasaPadi/2.png",
+  "Images/projects/CasaPadi/3.png",
+  "Images/projects/CasaPadi/4.png"
+];
+
+// Obtén el elemento de la imagen
+var imgElementPadi = document.getElementById("imgPadi");
+
+// Variable para llevar el conteo de la imagen actual
+var currentImageIndexPadi = 0;
+
+// Función para cambiar la imagen cada 3 segundos con animación de transición
+function changeImageWithTransitionPadi() {
+  // Desvanece la imagen actual cambiando su opacidad a 0
+  imgElementPadi.style.opacity = 0;
+
+  // Después de un breve retraso, cambia la imagen y restaura la opacidad a 1
+  setTimeout(function() {
+      // Cambia la fuente de la imagen al siguiente URL
+      imgElementPadi.src = imageUrlsPadi[currentImageIndexPadi];
+
+      // Incrementa el índice para apuntar a la siguiente imagen
+      currentImageIndexPadi++;
+
+      // Si llegamos al final de la lista de imágenes, volvemos al principio
+      if (currentImageIndexPadi === imageUrlsPadi.length) {
+          currentImageIndexPadi = 0;
+      }
+
+      // Hace que la imagen aparezca gradualmente restaurando su opacidad a 1
+      imgElementPadi.style.opacity = 1;
+  }, 500); // Espera 500 milisegundos (0.5 segundos) antes de cambiar la imagen
+}
+
+
+changeImageWithTransitionPadi();
+
+// Llama a la función changeImageWithTransitionPadi() cada 3 segundos
+setInterval(changeImageWithTransitionPadi, 3000); // Intervalo de cambio de imagen cada 3 segundos
+
+// Inicialmente llama a la función para que comience la transición
+
