@@ -40,7 +40,7 @@ test.describe('portfolio', () => {
   test('offers the CV as a download', async ({ page }) => {
     const link = page.getByRole('link', { name: 'Download CV' });
     await link.scrollIntoViewIfNeeded();
-    await expect(link).toHaveAttribute('href', '/docs/Emma_Dev_CV.pdf');
+    await expect(link).toHaveAttribute('href', '/docs/Emmanuel_Aguilar_CV.pdf');
   });
 
   test('publishes structured data describing the author', async ({ page }) => {

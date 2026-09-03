@@ -14,8 +14,41 @@ export const profile: Profile = profileSchema.parse({
   role: 'Software Engineer',
   headline: "Hi, I'm Emmanuel a Software Engineer",
   aboutHeading: 'Hi, nice to meet you',
+  /*
+   * One clause changed from the source: "As a software engineer with
+   * experience" became the concrete thing the CV shows he actually does now.
+   * The rest of the paragraph is his own wording, untouched — the CV carries no
+   * bio of its own, so there was nothing else to update from.
+   */
   aboutBody:
-    "I've always loved to design and create things since I was in high school. As a software engineer with experience, I now know that my inspiration is in developing unique products in the market. I'm confident, creative and naturally determined to keep improving my skills. My dream is to create digital art through my code and designs.",
+    "I've always loved to design and create things since I was in high school. Today I build mobile apps with Flutter, and I now know that my inspiration is in developing unique products in the market. I'm confident, creative and naturally determined to keep improving my skills. My dream is to create digital art through my code and designs.",
+  education: {
+    institution: 'Universidad Politécnica de Pachuca',
+    degree: 'Software Engineering',
+    period: 'Sep 2019 — Aug 2022',
+  },
+  // Verbatim from the CV's SKILLS section, in its order.
+  skills: {
+    languages: ['Dart', 'C#', 'HTML/CSS', 'Javascript', 'Java', 'Php'],
+    technologies: [
+      'Flutter',
+      'GetX',
+      'Bloc',
+      'Provider',
+      'Riverpod',
+      'Search Engine',
+      'Firebase',
+      'Supabase',
+      'CI-CD',
+      'Push Notification',
+      'Key Managment',
+      'MicrosoftSQL',
+      'PostgreSQL',
+      'Azure',
+      '.NET',
+      'NextJS',
+    ],
+  },
   portrait: {
     kind: 'image',
     src: '/media/portrait/emma.webp',
@@ -23,9 +56,12 @@ export const profile: Profile = profileSchema.parse({
     height: 800,
   },
   resume: {
-    pdf: '/docs/Emma_Dev_CV.pdf',
+    // Named after the author, not the project: this is what lands in a
+    // recruiter's downloads folder.
+    pdf: '/docs/Emmanuel_Aguilar_CV.pdf',
     preview: {
       kind: 'image',
+      // US Letter, so the preview keeps a 0.773 aspect ratio.
       src: '/media/docs/cv.webp',
       width: 1200,
       height: 1553,

@@ -70,7 +70,7 @@ const copyJobs = [
   { from: 'icons/github.png', to: 'icons/github.png' },
   { from: 'icons/linkedin.png', to: 'icons/linkedin.png' },
   { from: 'icons/arrow1.png', to: 'icons/arrow1.png' },
-  { from: 'docs/Emma_Dev_CV.pdf', to: 'docs/Emma_Dev_CV.pdf' },
+  { from: 'docs/Emmanuel_Aguilar_CV.pdf', to: 'docs/Emmanuel_Aguilar_CV.pdf' },
 ];
 
 /** H.264 needs even dimensions; VP9 is happier with them too. */

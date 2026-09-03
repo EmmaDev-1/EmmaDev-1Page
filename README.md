@@ -109,18 +109,24 @@ says they are on screen — scrolling past a project costs nothing.
 
 ## Known content notes
 
+**Experience**, **About Me** and the **CV** are sourced from `Emmanuel_Aguilar_CV.pdf`. The project
+copy is still the author's original wording from the old site.
+
 These were left as found because they are the author's own words, not refactor targets. Each is a
 one-line change in `src/content/` if wanted:
 
-- Typos carried over from the source: `riquierd` (×2), `objetive` (×2), `theire`, `educacion`,
-  `an simulation`, `ideal created`, `responsable`.
-- Technology labels keep their source casing on purpose: `Postgre SQL`, `Boostrap`, `FireBase`,
-  `Javascript`.
-- The **Personal** experience card repeats Grupo Indigo's full 17-chip technology list verbatim, as
-  the source did.
+- Typos carried over from the old site's project copy: `riquierd` (×2), `objetive` (×2), `theire`,
+  `educacion`, `an simulation`, `ideal created`.
+- Technology labels keep their source casing on purpose, in both the projects and the CV's own
+  skills list: `Postgre SQL`, `Boostrap`, `FireBase`, `Javascript`, `Key Managment`, `MicrosoftSQL`.
 - Five of the eight projects have no technology chips, because their descriptions name no
   technologies and inventing a stack would be a fabrication.
-- No dates on the experience cards — the source carried none.
+- The CV lists four newer projects — Colorinfinity, Bineo (Banorte), Dyshez and Habitan-t — that the
+  Projects section does not yet show. Adding them needs screenshots or recordings.
+- `profile.role` is still `Software Engineer`, matching the hero line and the degree, while every
+  CV job title is `Flutter Developer`.
+- The CV's contact details (email, phone) are deliberately **not** rendered into the page HTML. They
+  are in the downloadable PDF, but putting them in markup invites scrapers.
 
 ---
 

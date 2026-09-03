@@ -73,6 +73,12 @@ export const socialLinkSchema = z.object({
   label: nonEmpty,
 });
 
+export const educationSchema = z.object({
+  institution: nonEmpty,
+  degree: nonEmpty,
+  period: nonEmpty,
+});
+
 export const profileSchema = z.object({
   name: nonEmpty,
   role: nonEmpty,
@@ -80,6 +86,15 @@ export const profileSchema = z.object({
   headline: nonEmpty,
   aboutHeading: nonEmpty,
   aboutBody: nonEmpty,
+  education: educationSchema,
+  /**
+   * The CV's own skills list — the whole toolkit, not one employer's slice.
+   * Distinct from the per-role `stack` on an Experience entry.
+   */
+  skills: z.object({
+    languages: z.array(nonEmpty).min(1),
+    technologies: z.array(nonEmpty).min(1),
+  }),
   portrait: imageMediaSchema,
   resume: z.object({
     pdf: nonEmpty,
@@ -100,5 +115,6 @@ export type Media = z.infer<typeof mediaSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type Experience = z.infer<typeof experienceSchema>;
 export type Profile = z.infer<typeof profileSchema>;
+export type Education = z.infer<typeof educationSchema>;
 export type SocialLink = z.infer<typeof socialLinkSchema>;
 export type NavItem = z.infer<typeof navItemSchema>;

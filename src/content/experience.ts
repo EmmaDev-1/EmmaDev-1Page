@@ -1,89 +1,62 @@
 import { experienceSchema, type Experience } from './schema';
 
 /**
- * The three experience cards from the source carousel.
+ * Work history, taken from Emmanuel_Aguilar_CV.pdf and kept in the CV's own
+ * order: most recent first.
  *
- * Copy and technology labels are verbatim, vendor casing and all — the design
- * system calls this out explicitly ("Postgre SQL", "Boostrap", "FireBase",
- * "Javascript" keep their source spellings).
+ * Copy follows the CV's English wording. Where the CV writes a single dense
+ * paragraph, it is split at its own sentence boundaries so each card reads as
+ * discrete points — no sentence is reworded, added or dropped.
  *
- * The source carried no dates, so `period` is omitted rather than invented.
+ * `stack` lists only technologies the CV names for that role. The four roles
+ * are all Flutter work, so Flutter is on each; everything else appears exactly
+ * where the CV puts it. Nothing is inferred: a technology in the CV's global
+ * skills list is not attributed to a specific employer.
  */
 export const experience: Experience[] = experienceSchema.array().parse([
   {
-    id: 'osc-compliance',
-    org: 'OSC Compliance',
+    id: 'pai',
+    org: 'Pai, Stripe Partner',
+    role: 'Flutter Developer · Remote',
+    period: 'Apr 2025 — Present',
     points: [
-      'Worked implementing data structuring patterns to enhance data organization, retrieval, and manipulation, optimizing system performance.',
-      'Designed and complemented Business management applications that improved workflow efficiency and data management for clients.',
+      'At Pai, I work on multiple simultaneous projects, specifically mobile apps with Flutter.',
+      'On a day-to-day basis, I set up projects with all the necessary infrastructure to ensure quality.',
+      'I hold meetings with clients, teams, and PMs for the implementation of new features.',
     ],
-    stack: [
-      'Java',
-      'Spring Tools',
-      'Postgre SQL',
-      'pgAdmin',
-      'Apache',
-      'Ajax',
-      'HTML',
-      'CSS',
-      'PrimeFaces',
-    ],
+    stack: ['Flutter', 'Dart'],
   },
   {
-    id: 'grupo-indigo',
-    org: 'Grupo Indigo',
+    id: 'greelow',
+    org: 'Greelow',
+    role: 'Flutter Developer · Remote',
+    period: 'Feb 2025 — Apr 2025',
     points: [
-      'At Grupo indigo, I am part of a dynamic team that specializes in developing mobile applications. Our focus areas include E-Commerce and the creation of custom mobile applications.',
-      'Proposed project ideas and suggested valuable improvements that have enhanced application performance.',
-      'Designed and implemented applications for businesses, with features for control and user management',
+      'At Greelow, I worked hand in hand with a large team of developers for the Banorte bank client, developing secure features for their processes.',
+      'Having direct contact with Banorte to address required requests, and ensuring a design identical to figma.',
     ],
-    stack: [
-      'Flutter',
-      'Dart',
-      'Android Studio',
-      'Boostrap',
-      'HTML',
-      'CSS',
-      'Javascript',
-      'C#',
-      'ASP.NET MVC 5',
-      'Azure',
-      'FireBase',
-      'Microsoft SQL',
-      'Postman',
-      'Json',
-      'Rest API Push Notifications',
-      'One Signal',
-      'XML',
-    ],
+    stack: ['Flutter', 'Dart', 'Figma'],
   },
   {
-    id: 'personal',
-    org: 'Personal',
+    id: 'dyshez',
+    org: 'Dyshez',
+    role: 'Flutter Developer · Remote',
+    period: 'Aug 2024 — Jan 2025',
     points: [
-      "I'm an autodidact person, I'm always learning new technologies.",
-      'The words that describe me are responsable, efficiency and loyal.',
+      "At Dyshez, I implemented Typesense as an advanced search engine, Doppler for secure secret management, and generated technical documentation for the entire app's workflows.",
+      'My time at Dyshez focused on improving timelines, process quality, and incorporating new technologies.',
     ],
-    // The source repeated the full Grupo Indigo chip list here verbatim. Kept as
-    // found; see the refactor notes for the suggestion to curate it.
-    stack: [
-      'Flutter',
-      'Dart',
-      'Android Studio',
-      'Boostrap',
-      'HTML',
-      'CSS',
-      'Javascript',
-      'C#',
-      'ASP.NET MVC 5',
-      'Azure',
-      'FireBase',
-      'Microsoft SQL',
-      'Postman',
-      'Json',
-      'Rest API Push Notifications',
-      'One Signal',
-      'XML',
+    stack: ['Flutter', 'Dart', 'Typesense', 'Doppler'],
+  },
+  {
+    id: 'gintec-aply',
+    org: 'Gintec Aply',
+    role: 'Flutter Developer · México',
+    period: 'Apr 2023 — Apr 2024',
+    points: [
+      'As a project lead with a small but dynamic team specializing in mobile app development.',
+      'Our focus was working closely with the client and UI/UX designer, generating weekly deliveries and ensuring process quality and efficiency.',
     ],
+    stack: ['Flutter', 'Dart'],
   },
 ] satisfies Experience[]);

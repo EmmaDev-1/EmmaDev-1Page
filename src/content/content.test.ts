@@ -15,8 +15,20 @@ const publicPath = (webPath: string) => path.join(PUBLIC, webPath.replace(/^\//,
 describe('content invariants', () => {
   it('parses every schema at import time', () => {
     expect(projects.length).toBe(8);
-    expect(experience.length).toBe(3);
+    expect(experience.length).toBe(4);
     expect(profile.social.length).toBeGreaterThan(0);
+  });
+
+  it('lists experience most recent first', () => {
+    // The CV's order is the intended reading order; a reshuffle should fail.
+    expect(experience.map((role) => role.id)).toEqual(['pai', 'greelow', 'dyshez', 'gintec-aply']);
+  });
+
+  it('dates and titles every role', () => {
+    for (const role of experience) {
+      expect(role.period, role.id).toBeTruthy();
+      expect(role.role, role.id).toBeTruthy();
+    }
   });
 
   it('has unique project ids', () => {
