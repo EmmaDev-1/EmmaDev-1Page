@@ -1,0 +1,99 @@
+/* EmmaDev — colour system.
+   Base is graphite black (#151515 from the source site). The signature is a
+   three-stop purple -> orange -> purple gradient used for text and edges only,
+   never as a large background fill.
+
+   Vendored from the EmmaDev Design System. Do not hand-edit — run `pnpm ds:sync`. */
+:root {
+  /* ---- Graphite ramp (base) ---- */
+  --graphite-000: #000000;
+  --graphite-050: #0b0b0b;
+  --graphite-100: #111111;
+  --graphite-150: #151515; /* source background */
+  --graphite-200: #1a1a1a;
+  --graphite-300: #222222;
+  --graphite-400: #2a2a2a;
+  --graphite-500: #333333; /* source nav-panel background */
+  --graphite-600: #4a4a4a;
+  --graphite-700: #6b6b6b;
+  --graphite-800: #9a9a9a;
+  --graphite-900: #c9c9c9;
+
+  /* ---- Ink (text) ---- */
+  --ink-000: #ffffff;
+  --ink-100: #e9e9e9; /* source body/nav text */
+  --ink-200: #c9c9c9;
+  --ink-300: #8f8f8f;
+  --ink-400: #6b6b6b;
+
+  /* ---- Accent: violet (primary) ---- */
+  --violet-300: #e2a9f2;
+  --violet-400: #d689ec;
+  --violet-500: #c172d7;
+  --violet-600: #ae4fca; /* gradient stop 3 */
+  --violet-700: #a945c7; /* gradient stop 1 - THE brand purple */
+  --violet-800: #7d2f94;
+
+  /* ---- Accent: ember (secondary) ---- */
+  --ember-400: #ff8a63;
+  --ember-500: #ff6237; /* gradient stop 2 */
+  --ember-600: #e04a22;
+
+  /* ---- Cursor-trail ramp (13 steps, verbatim from principal.js) ---- */
+  --trail-01: #a945c7;
+  --trail-02: #a945c7;
+  --trail-03: #ae4fca;
+  --trail-04: #ae4fca;
+  --trail-05: #b55ccf;
+  --trail-06: #b55ccf;
+  --trail-07: #bb67d3;
+  --trail-08: #c172d7;
+  --trail-09: #ce7fe4;
+  --trail-10: #d689ec;
+  --trail-11: #df90f6;
+  --trail-12: #e19cf5;
+  --trail-13: #e2a9f2;
+
+  /* ---- Legacy (source site only; do NOT use in new work) ---- */
+  --legacy-card-navy: #101f57;
+  --legacy-chip-navy: #000e42;
+  --legacy-chip-navy-hover: #2c3d79;
+
+  /* ================= Semantic aliases ================= */
+  --bg-page: var(--graphite-150);
+  --bg-page-deep: var(--graphite-050);
+  --surface-raised: var(--graphite-200);
+  --surface-card: var(--graphite-200);
+  --surface-card-hover: var(--graphite-300);
+  --surface-inset: var(--graphite-100);
+  --surface-chip: var(--graphite-300);
+  --surface-chip-hover: var(--graphite-400);
+  --surface-overlay: rgba(0, 0, 0, 0.5); /* source .overlay */
+  --surface-glass: rgba(21, 21, 21, 0.72); /* blurred sticky bars */
+
+  --text-heading: var(--ink-000);
+  --text-body: var(--ink-100);
+  --text-muted: var(--ink-300);
+  --text-faint: var(--ink-400);
+  --text-on-accent: #ffffff;
+
+  --border-hairline: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --border-accent: var(--violet-700);
+
+  --accent: var(--violet-700);
+  --accent-hover: var(--violet-600);
+  --accent-soft: rgba(169, 69, 199, 0.14);
+  --accent-soft-strong: rgba(169, 69, 199, 0.35);
+  --accent-secondary: var(--ember-500);
+
+  --focus-ring: var(--violet-400);
+
+  /* ---- Signature gradients ---- */
+  --gradient-brand: linear-gradient(to right, #a945c7, #ff6237, #ae4fca);
+  --gradient-brand-vertical: linear-gradient(#a945c7, #ff6237, #ae4fca);
+  --gradient-brand-wide: linear-gradient(100deg, #a945c7, #ff6237, #ae4fca, #a945c7);
+  --gradient-hairline: linear-gradient(90deg, transparent, rgba(169, 69, 199, 0.55), transparent);
+  --gradient-scrim: linear-gradient(180deg, rgba(21, 21, 21, 0), rgba(21, 21, 21, 0.92));
+}

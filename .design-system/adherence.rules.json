@@ -1,0 +1,144 @@
+{
+  "_note": [
+    "Design-system adherence rules, vendored from the EmmaDev Design System.",
+    "Two things are adapted for this repo: the import patterns point at",
+    "@/components/design-system/* instead of the upstream bare paths, and a few",
+    "DOM passthrough props (onClick, disabled, id) are added to the prop",
+    "allowlists because the vendored components spread ...rest onto the element.",
+    "The selectors are esquery and are applied by ESLint (eslint.adherence.config.mjs);",
+    "oxlint does not implement no-restricted-syntax."
+  ],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": [
+              "@/components/design-system/core/*",
+              "@/components/design-system/motion/*",
+              "@/components/design-system/navigation/*",
+              "@/components/design-system/portfolio/*"
+            ],
+            "message": "Import design-system components from '@/components/design-system', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Varela Round|JetBrains Mono))/i]",
+        "message": "Font not provided by the design system. Available: Varela Round, JetBrains Mono."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='BlobPortrait'] > JSXAttribute > JSXIdentifier[name!=/^(?:src|alt|size|ring|key|ref|className|style|children)$/]",
+        "message": "<BlobPortrait> doesn't accept that prop. Declared props: src, alt, size, ring."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|disabled|fullWidth|href|iconLeft|iconRight|children|key|ref|className|style)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, disabled, fullWidth, href, iconLeft, iconRight, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:solid|outline|ghost|gradient)$/]",
+        "message": "<Button> variant must be one of 'solid' | 'outline' | 'ghost' | 'gradient'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CursorTrail'] > JSXAttribute > JSXIdentifier[name!=/^(?:count|dotSize|colors|follow|key|ref|className|style|children)$/]",
+        "message": "<CursorTrail> doesn't accept that prop. Declared props: count, dotSize, colors, follow."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ExperienceCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:org|role|period|points|stack|key|ref|className|style|children)$/]",
+        "message": "<ExperienceCard> doesn't accept that prop. Declared props: org, role, period, points, stack."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='GradientFrame'] > JSXAttribute > JSXIdentifier[name!=/^(?:radius|inset|speed|children|key|ref|className|style)$/]",
+        "message": "<GradientFrame> doesn't accept that prop. Declared props: radius, inset, speed, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='GradientText'] > JSXAttribute > JSXIdentifier[name!=/^(?:as|animate|speed|children|key|ref|className|style)$/]",
+        "message": "<GradientText> doesn't accept that prop. Declared props: as, animate, speed, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='IconButton'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|size|glyph|children|key|ref|className|style|onClick|disabled)$/]",
+        "message": "<IconButton> doesn't accept that prop. Declared props: label, size, glyph, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MediaCarousel'] > JSXAttribute > JSXIdentifier[name!=/^(?:images|alt|interval|fade|radius|key|ref|className|style|children)$/]",
+        "message": "<MediaCarousel> doesn't accept that prop. Declared props: images, alt, interval, fade, radius."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavBar'] > JSXAttribute > JSXIdentifier[name!=/^(?:items|activeHref|brand|right|onToggle|key|ref|className|style|children)$/]",
+        "message": "<NavBar> doesn't accept that prop. Declared props: items, activeHref, brand, right, onToggle."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavLink'] > JSXAttribute > JSXIdentifier[name!=/^(?:href|active|children|key|ref|className|style)$/]",
+        "message": "<NavLink> doesn't accept that prop. Declared props: href, active, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavPanel'] > JSXAttribute > JSXIdentifier[name!=/^(?:open|items|activeHref|onClose|footer|key|ref|className|style|children)$/]",
+        "message": "<NavPanel> doesn't accept that prop. Declared props: open, items, activeHref, onClose, footer."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavToggle'] > JSXAttribute > JSXIdentifier[name!=/^(?:open|key|ref|className|style|children|onClick)$/]",
+        "message": "<NavToggle> doesn't accept that prop. Declared props: open."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ProjectRow'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|description|media|stack|flip|index|key|ref|className|style|children|id)$/]",
+        "message": "<ProjectRow> doesn't accept that prop. Declared props: title, description, media, stack, flip, index."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ResumePreview'] > JSXAttribute > JSXIdentifier[name!=/^(?:src|href|width|height|label|key|ref|className|style|children)$/]",
+        "message": "<ResumePreview> doesn't accept that prop. Declared props: src, href, width, height, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Reveal'] > JSXAttribute > JSXIdentifier[name!=/^(?:from|delay|duration|blur|once|as|key|ref|className|style|children)$/]",
+        "message": "<Reveal> doesn't accept that prop. Declared props: from, delay, duration, blur, once, as."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Reveal'] > JSXAttribute[name.name='from'] > Literal[value!=/^(?:up|down|left|right|none)$/]",
+        "message": "<Reveal> from must be one of 'up' | 'down' | 'left' | 'right' | 'none'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ScrollTopArrow'] > JSXAttribute > JSXIdentifier[name!=/^(?:href|assetBase|size|visible|key|ref|className|style|children)$/]",
+        "message": "<ScrollTopArrow> doesn't accept that prop. Declared props: href, assetBase, size, visible."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SectionHeading'] > JSXAttribute > JSXIdentifier[name!=/^(?:eyebrow|align|rule|children|key|ref|className|style)$/]",
+        "message": "<SectionHeading> doesn't accept that prop. Declared props: eyebrow, align, rule, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SectionHeading'] > JSXAttribute[name.name='align'] > Literal[value!=/^(?:left|center)$/]",
+        "message": "<SectionHeading> align must be one of 'left' | 'center'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SocialIconLink'] > JSXAttribute > JSXIdentifier[name!=/^(?:network|href|size|assetBase|label|key|ref|className|style|children)$/]",
+        "message": "<SocialIconLink> doesn't accept that prop. Declared props: network, href, size, assetBase, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SocialIconLink'] > JSXAttribute[name.name='network'] > Literal[value!=/^(?:github|linkedin)$/]",
+        "message": "<SocialIconLink> network must be one of 'github' | 'linkedin'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TagChip'] > JSXAttribute > JSXIdentifier[name!=/^(?:tone|interactive|children|key|ref|className|style)$/]",
+        "message": "<TagChip> doesn't accept that prop. Declared props: tone, interactive, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TagChip'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:neutral|accent)$/]",
+        "message": "<TagChip> tone must be one of 'neutral' | 'accent'."
+      }
+    ]
+  }
+}

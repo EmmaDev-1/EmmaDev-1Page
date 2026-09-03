@@ -1,0 +1,21 @@
+/* EmmaDev — shadows and glows.
+   Two systems: black drop shadows for lift on graphite, and violet glows
+   for interactive emphasis (the source's signature hover).
+
+   Vendored from the EmmaDev Design System. Do not hand-edit — run `pnpm ds:sync`. */
+:root {
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.7); /* source card: 0 15px 10px #000 */
+  --shadow-portrait: 10px 10px 15px rgba(0, 0, 0, 1); /* source .blob-image */
+
+  --glow-accent-sm: 0 0 10px rgba(169, 69, 199, 0.55);
+  --glow-accent-md: 0 0 10px rgba(169, 69, 199, 0.7), 0 0 40px rgba(169, 69, 199, 0.45);
+  --glow-accent-lg:
+    0 0 10px rgba(169, 69, 199, 0.8), 0 0 40px rgba(169, 69, 199, 0.55),
+    0 0 80px rgba(169, 69, 199, 0.35);
+  --glow-ember-md: 0 0 12px rgba(255, 98, 55, 0.6), 0 0 36px rgba(255, 98, 55, 0.35);
+
+  --blur-glass: 14px;
+  --blur-veil: 5px; /* source reveal-from-blur value */
+}

@@ -1,0 +1,42 @@
+/* EmmaDev — typography.
+   One rounded sans for everything human (Varela Round, weight 400 only —
+   the family has no other weight; "bolder" in the source rendered as a
+   synthetic bold and is avoided here). Mono for technical metadata.
+
+   NOTE: --font-core and --font-mono are re-bound in globals.css to the
+   next/font families, so the faces are self-hosted rather than fetched from
+   the Google CDN. The stacks below stay as the documented fallback order.
+
+   Vendored from the EmmaDev Design System. Do not hand-edit — run `pnpm ds:sync`. */
+:root {
+  --font-core: 'Varela Round', 'Trebuchet MS', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Display / hero */
+  --text-display-1: clamp(44px, 7vw, 92px);
+  --text-display-2: clamp(34px, 5vw, 64px);
+  /* Section + card headings */
+  --text-heading-1: clamp(28px, 3.4vw, 44px);
+  --text-heading-2: 24px;
+  --text-heading-3: 20px;
+  /* Body */
+  --text-body-lg: 18px;
+  --text-body-md: 16px;
+  --text-body-sm: 14px;
+  /* Utility */
+  --text-label: 13px;
+  --text-micro: 11px;
+
+  --leading-tight: 1.06;
+  --leading-snug: 1.28;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-display: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-nav: 0.02em;
+  --tracking-wide: 0.14em; /* mono eyebrows, uppercase */
+  --tracking-widest: 0.22em;
+
+  --weight-regular: 400;
+}

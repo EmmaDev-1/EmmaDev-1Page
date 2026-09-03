@@ -1,0 +1,239 @@
+@import 'tailwindcss';
+@import './design-system/tokens/index.css';
+
+/*
+  Bridge: the design system's CSS custom properties become Tailwind v4 theme
+  values, so `bg-surface-card` and `var(--surface-card)` are the same thing and
+  cannot drift apart. `inline` makes the generated utilities reference the DS
+  variable directly rather than copying its value, so a token change cascades.
+
+  Regenerate with `pnpm ds:sync`, which fails if a token in the upstream
+  manifest is missing here.
+*/
+@theme inline {
+  /* ---- Colour ---- */
+  --color-graphite-000: var(--graphite-000);
+  --color-graphite-050: var(--graphite-050);
+  --color-graphite-100: var(--graphite-100);
+  --color-graphite-150: var(--graphite-150);
+  --color-graphite-200: var(--graphite-200);
+  --color-graphite-300: var(--graphite-300);
+  --color-graphite-400: var(--graphite-400);
+  --color-graphite-500: var(--graphite-500);
+  --color-graphite-600: var(--graphite-600);
+  --color-graphite-700: var(--graphite-700);
+  --color-graphite-800: var(--graphite-800);
+  --color-graphite-900: var(--graphite-900);
+
+  --color-ink-000: var(--ink-000);
+  --color-ink-100: var(--ink-100);
+  --color-ink-200: var(--ink-200);
+  --color-ink-300: var(--ink-300);
+  --color-ink-400: var(--ink-400);
+
+  --color-violet-300: var(--violet-300);
+  --color-violet-400: var(--violet-400);
+  --color-violet-500: var(--violet-500);
+  --color-violet-600: var(--violet-600);
+  --color-violet-700: var(--violet-700);
+  --color-violet-800: var(--violet-800);
+
+  --color-ember-400: var(--ember-400);
+  --color-ember-500: var(--ember-500);
+  --color-ember-600: var(--ember-600);
+
+  --color-page: var(--bg-page);
+  --color-page-deep: var(--bg-page-deep);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-hover: var(--surface-card-hover);
+  --color-surface-inset: var(--surface-inset);
+  --color-surface-chip: var(--surface-chip);
+  --color-surface-chip-hover: var(--surface-chip-hover);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-surface-glass: var(--surface-glass);
+
+  --color-heading: var(--text-heading);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-on-accent: var(--text-on-accent);
+
+  --color-hairline: var(--border-hairline);
+  --color-subtle: var(--border-subtle);
+  --color-strong: var(--border-strong);
+  --color-border-accent: var(--border-accent);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-strong: var(--accent-soft-strong);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-focus-ring: var(--focus-ring);
+
+  /* ---- Type ---- */
+  --font-core: var(--font-core);
+  --font-mono: var(--font-mono);
+
+  --text-display-1: var(--text-display-1);
+  --text-display-2: var(--text-display-2);
+  --text-heading-1: var(--text-heading-1);
+  --text-heading-2: var(--text-heading-2);
+  --text-heading-3: var(--text-heading-3);
+  --text-body-lg: var(--text-body-lg);
+  --text-body-md: var(--text-body-md);
+  --text-body-sm: var(--text-body-sm);
+  --text-label: var(--text-label);
+  --text-micro: var(--text-micro);
+
+  --leading-tight: var(--leading-tight);
+  --leading-snug: var(--leading-snug);
+  --leading-normal: var(--leading-normal);
+  --leading-relaxed: var(--leading-relaxed);
+
+  --tracking-display: var(--tracking-display);
+  --tracking-normal: var(--tracking-normal);
+  --tracking-nav: var(--tracking-nav);
+  --tracking-wide: var(--tracking-wide);
+  --tracking-widest: var(--tracking-widest);
+
+  /* ---- Radii ---- */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+
+  /* ---- Elevation ---- */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-portrait: var(--shadow-portrait);
+  --shadow-glow-sm: var(--glow-accent-sm);
+  --shadow-glow-md: var(--glow-accent-md);
+  --shadow-glow-lg: var(--glow-accent-lg);
+  --shadow-glow-ember: var(--glow-ember-md);
+
+  /* ---- Motion ---- */
+  --ease-standard: var(--ease-standard);
+  --ease-out-soft: var(--ease-out-soft);
+  --ease-out-expo: var(--ease-out-expo);
+  --ease-settle: var(--ease-settle);
+
+  /* ---- Layout ---- */
+  --container-content: var(--content-max);
+  --container-narrow: var(--content-narrow);
+}
+
+/*
+  The DS spacing scale is a 4px base, which is exactly Tailwind's dynamic
+  spacing multiplier — so `p-4` resolves to the DS --space-4 (16px) and the
+  whole 0-40 ramp lines up without enumerating each step.
+*/
+@theme {
+  --spacing: 4px;
+  --breakpoint-nav: 768px;
+}
+
+/*
+  Re-bind the two family tokens onto the next/font faces (see app/layout.tsx).
+  Upstream tokens/fonts.css pulls both from the Google CDN, which is a
+  render-blocking third-party request and a CLS risk; next/font self-hosts them
+  and inlines the @font-face at build time.
+
+  Deliberately unlayered: the vendored token file is unlayered too, and
+  unlayered rules beat @layer base regardless of order, so this override has to
+  sit at the same level and simply come later.
+*/
+:root {
+  --font-core: var(--font-varela-round), 'Trebuchet MS', system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /*
+    App-level layout constants. These are not design-system tokens — they are
+    measurements this particular page needs — but they live as custom properties
+    for the same reason the DS ones do: so no raw px ends up in a className, and
+    the adherence lint stays meaningful.
+  */
+  --nav-height: 72px;
+  --media-max-height: 560px;
+  --rail-card-width: min(85vw, 360px);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* The sticky nav must not cover the section a hash link lands on. */
+    scroll-padding-top: var(--space-20);
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-body);
+    font-family: var(--font-core);
+    font-weight: var(--weight-regular);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /*
+    Varela Round ships a single 400 weight. The source set `font-weight: bolder`,
+    which browsers faked with a synthetic bold; hierarchy here comes from size
+    and colour instead, so headings stay at the real weight.
+  */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: var(--weight-regular);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background: var(--accent-soft-strong);
+    color: var(--ink-000);
+  }
+
+  /*
+    Motion is the brand, so it is never removed wholesale — but everything that
+    travels is collapsed to a near-instant state for anyone who asks for it.
+    The CursorTrail opts itself out separately.
+  */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* The one background event the system allows: a soft brand bloom. */
+  .bloom-hero {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 70vh;
+    pointer-events: none;
+    background: var(--gradient-brand-wide);
+    opacity: 0.13;
+    filter: blur(120px);
+    z-index: 0;
+  }
+}

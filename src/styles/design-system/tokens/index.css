@@ -1,0 +1,13 @@
+/* EmmaDev Design System — token entry point.
+   Mirrors the upstream styles.css.
+
+   tokens/fonts.css is deliberately NOT vendored: the upstream file pulls both
+   faces from the Google CDN, which is a render-blocking third-party request.
+   The faces are loaded through next/font instead (see src/app/layout.tsx) and
+   --font-core / --font-mono are re-bound in globals.css. */
+@import './colors.css';
+@import './typography.css';
+@import './spacing.css';
+@import './radii.css';
+@import './elevation.css';
+@import './motion.css';

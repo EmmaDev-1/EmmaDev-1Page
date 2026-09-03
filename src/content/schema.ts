@@ -1,0 +1,104 @@
+import { z } from 'zod';
+
+/**
+ * Content contracts.
+ *
+ * These run at module load, which on a statically rendered page means build
+ * time: a malformed entry fails `next build` rather than shipping. Keep the
+ * schemas strict — silently accepting a bad shape is the failure mode this
+ * layer exists to prevent.
+ */
+
+const nonEmpty = z.string().trim().min(1);
+
+/** A still image rendered through next/image. */
+export const imageMediaSchema = z.object({
+  kind: z.literal('image'),
+  src: nonEmpty,
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
+
+/**
+ * A screen recording. The source shipped these as GIFs (up to 36 MB each);
+ * the media pipeline re-encodes them to MP4 + WebM with a still poster.
+ */
+export const videoMediaSchema = z.object({
+  kind: z.literal('video'),
+  /** Path without extension — `.mp4`, `.webm` and `.poster.webp` are derived. */
+  basePath: nonEmpty,
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
+
+/** Several stills that cross-fade, for projects with more than one view. */
+export const carouselMediaSchema = z.object({
+  kind: z.literal('carousel'),
+  images: z.array(nonEmpty).min(2),
+});
+
+export const mediaSchema = z.discriminatedUnion('kind', [
+  imageMediaSchema,
+  videoMediaSchema,
+  carouselMediaSchema,
+]);
+
+export const projectSchema = z.object({
+  /** Stable key — also the anchor fragment. */
+  id: nonEmpty.regex(/^[a-z0-9-]+$/, 'ids are lowercase kebab-case'),
+  title: nonEmpty,
+  description: nonEmpty,
+  media: mediaSchema,
+  /**
+   * Technologies the project's own copy names. Left empty rather than guessed:
+   * inventing a stack would put words in the author's mouth.
+   */
+  stack: z.array(nonEmpty).default([]),
+  /** Alt text for the project's media. Never empty — these carry meaning. */
+  alt: nonEmpty,
+});
+
+export const experienceSchema = z.object({
+  id: nonEmpty.regex(/^[a-z0-9-]+$/),
+  org: nonEmpty,
+  role: nonEmpty.optional(),
+  period: nonEmpty.optional(),
+  points: z.array(nonEmpty).min(1),
+  stack: z.array(nonEmpty).default([]),
+});
+
+export const socialLinkSchema = z.object({
+  network: z.enum(['github', 'linkedin']),
+  href: z.url(),
+  label: nonEmpty,
+});
+
+export const profileSchema = z.object({
+  name: nonEmpty,
+  role: nonEmpty,
+  /** The hero line, verbatim from the source. */
+  headline: nonEmpty,
+  aboutHeading: nonEmpty,
+  aboutBody: nonEmpty,
+  portrait: imageMediaSchema,
+  resume: z.object({
+    pdf: nonEmpty,
+    preview: imageMediaSchema,
+  }),
+  social: z.array(socialLinkSchema).min(1),
+});
+
+export const navItemSchema = z.object({
+  href: nonEmpty.startsWith('#'),
+  label: nonEmpty,
+});
+
+export type ImageMedia = z.infer<typeof imageMediaSchema>;
+export type VideoMedia = z.infer<typeof videoMediaSchema>;
+export type CarouselMedia = z.infer<typeof carouselMediaSchema>;
+export type Media = z.infer<typeof mediaSchema>;
+export type Project = z.infer<typeof projectSchema>;
+export type Experience = z.infer<typeof experienceSchema>;
+export type Profile = z.infer<typeof profileSchema>;
+export type SocialLink = z.infer<typeof socialLinkSchema>;
+export type NavItem = z.infer<typeof navItemSchema>;

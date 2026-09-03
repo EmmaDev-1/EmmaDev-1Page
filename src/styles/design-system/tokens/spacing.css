@@ -1,0 +1,32 @@
+/* EmmaDev — spacing. 4px base; the source used percentage padding,
+   which is restated here as fixed steps plus explicit section rhythm.
+
+   Vendored from the EmmaDev Design System. Do not hand-edit — run `pnpm ds:sync`. */
+:root {
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --space-40: 160px;
+
+  --gutter-mobile: 20px;
+  --gutter-desktop: 48px;
+  --section-y-mobile: 80px;
+  --section-y-desktop: 160px;
+
+  --measure-prose: 62ch;
+  --content-max: 1180px;
+  --content-narrow: 760px;
+
+  --tap-min: 44px;
+}

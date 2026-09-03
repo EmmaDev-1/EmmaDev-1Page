@@ -1,0 +1,27 @@
+/* EmmaDev — motion. Movement is the brand: everything reveals, nothing pops.
+   The source used long 2.5-3.5s reveals; these are tightened but keep the
+   same character (blur-out + slide + settle).
+
+   Vendored from the EmmaDev Design System. Do not hand-edit — run `pnpm ds:sync`. */
+:root {
+  --dur-instant: 120ms;
+  --dur-fast: 200ms;
+  --dur-normal: 300ms;
+  --dur-slow: 500ms;
+  --dur-reveal: 800ms;
+  --dur-reveal-long: 1200ms;
+  --dur-gradient-cycle: 6s; /* source navbar gradient sweep */
+  --dur-blob-cycle: 10s; /* source portrait morph */
+  --dur-orbit: 4s; /* source rotating gradient frame */
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-settle: cubic-bezier(0.34, 1.56, 0.64, 1); /* the source's bounce-in-place */
+  --ease-linear: linear;
+
+  --stagger-step: 120ms;
+  --lift-hover: -4px;
+  --scale-press: 0.97;
+  --scale-icon-hover: 1.4; /* source .contact-icons img:hover */
+}
