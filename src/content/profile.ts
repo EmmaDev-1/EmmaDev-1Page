@@ -36,27 +36,23 @@ export const profile: Profile = profileSchema.parse({
     degree: 'Software Engineering',
     period: 'Sep 2019 — Aug 2022',
   },
-  // Verbatim from the CV's SKILLS section, in its order.
+  /*
+   * Curated, not the CV's full SKILLS dump (that list ran to 22 chips across
+   * languages and technologies). At the author's direction: the two axes he
+   * wants Toolkit to headline are deep, extensive mobile experience —
+   * specifically Flutter — and the web frontend skill he has spent the last
+   * year building, Next.js. Dart and Firebase complete the Flutter story
+   * (Flutter's language, and the backend it is most commonly paired with in
+   * his own CV); Javascript and HTML/CSS complete the Next.js one.
+   *
+   * The rest of the CV's list (GetX, Bloc, Provider, Riverpod, Supabase,
+   * Azure, .NET, C#, Java, Php, and the rest) is real but not what he asked
+   * this section to lead with. None of it is lost — it is still in this
+   * file's git history and on the downloadable CV.
+   */
   skills: {
-    languages: ['Dart', 'C#', 'HTML/CSS', 'Javascript', 'Java', 'Php'],
-    technologies: [
-      'Flutter',
-      'GetX',
-      'Bloc',
-      'Provider',
-      'Riverpod',
-      'Search Engine',
-      'Firebase',
-      'Supabase',
-      'CI-CD',
-      'Push Notification',
-      'Key Managment',
-      'MicrosoftSQL',
-      'PostgreSQL',
-      'Azure',
-      '.NET',
-      'NextJS',
-    ],
+    languages: ['Dart', 'Javascript', 'HTML/CSS'],
+    technologies: ['Flutter', 'NextJS', 'Firebase'],
   },
   portrait: {
     kind: 'image',
