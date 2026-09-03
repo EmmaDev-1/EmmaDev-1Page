@@ -69,6 +69,28 @@ test.describe('desktop navigation', () => {
     await expect(projectsLink).toBeVisible();
   });
 
+  test.describe('jump-link landing', () => {
+    /**
+     * `scroll-padding-top` on <html> and `scroll-margin-top` on the target both
+     * contribute to a fragment-navigation landing spot, per the CSS Scroll
+     * Snap spec — declaring the same nav-clearance offset in both places
+     * doubled it, landing every section 80px further down than intended.
+     */
+    for (const href of ['#about', '#projects', '#experience', '#curriculum']) {
+      test(`lands ${href} just under the nav, not floating further down`, async ({ page }) => {
+        await page.goto('/');
+        await page.click(`header a[href="${href}"]`);
+        await page.waitForTimeout(1500);
+
+        const top = await page.locator(href).evaluate((el) => el.getBoundingClientRect().top);
+
+        // One offset, not two: within a few px of --space-20 (80px), not ~160px.
+        expect(top).toBeGreaterThan(60);
+        expect(top).toBeLessThan(100);
+      });
+    }
+  });
+
   test.describe('hide on scroll', () => {
     /** Wheel events rather than scrollTo: the hook reads direction, not position. */
     const wheel = async (page: import('@playwright/test').Page, dy: number) => {
