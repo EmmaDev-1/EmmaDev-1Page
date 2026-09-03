@@ -6,7 +6,11 @@
     "suspicious": "warn",
     "perf": "warn"
   },
-  "env": { "browser": true, "es2024": true, "node": true },
+  "env": {
+    "browser": true,
+    "es2024": true,
+    "node": true
+  },
   "ignorePatterns": [
     "node_modules",
     ".next",
@@ -15,16 +19,31 @@
     ".design-system"
   ],
   "rules": {
-    "eslint/no-console": ["warn", { "allow": ["warn", "error"] }],
+    "eslint/no-console": [
+      "warn",
+      {
+        "allow": ["warn", "error"]
+      }
+    ],
     "eslint/no-var": "error",
     "eslint/prefer-const": "error",
     "typescript/no-explicit-any": "error",
-    "unicorn/prefer-node-protocol": "error"
+    "unicorn/prefer-node-protocol": "error",
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": [
+      "warn",
+      {
+        "allow": ["**/*.css"]
+      }
+    ]
   },
   "overrides": [
     {
       "files": ["scripts/**"],
-      "rules": { "eslint/no-console": "off" }
+      "rules": {
+        "eslint/no-console": "off",
+        "eslint/no-await-in-loop": "off"
+      }
     }
   ]
 }

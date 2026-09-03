@@ -23,12 +23,18 @@ export function useScrollSpy(ids: readonly string[], fallback: string): string {
     const observer = new IntersectionObserver(
       (entries) => {
         // Prefer whichever tracked section is nearest the top of the viewport.
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        // A single pass rather than filter-then-sort: this runs on every
+        // crossing, and there is never a reason to order the whole set when
+        // only the minimum is wanted.
+        let nearest: IntersectionObserverEntry | undefined;
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          if (!nearest || entry.boundingClientRect.top < nearest.boundingClientRect.top) {
+            nearest = entry;
+          }
+        }
 
-        const first = visible[0];
-        if (first) setActive(first.target.id);
+        if (nearest) setActive(nearest.target.id);
       },
       { rootMargin: SCROLL_SPY_ROOT_MARGIN, threshold: 0 },
     );

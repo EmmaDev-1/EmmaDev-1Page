@@ -31,6 +31,12 @@ export default defineConfig([
     'src/components/design-system/**',
     // Compatibility shim for the vendored declarations.
     'src/types/**',
+    // The one sanctioned home for literal brand values — meta tags, the
+    // Satori-rendered OG image and IntersectionObserver rootMargin cannot read
+    // a CSS custom property. Exempting it by path keeps every other file fully
+    // covered, and keeps the exemption declared here rather than as a comment
+    // buried in the file itself.
+    'src/lib/brand.ts',
   ]),
   {
     files: ['src/**/*.{ts,tsx}'],

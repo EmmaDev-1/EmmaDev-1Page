@@ -1,7 +1,9 @@
-/* eslint-disable no-restricted-syntax -- see the note below */
-
 /**
  * The only place in the app allowed to hold literal brand values.
+ *
+ * Exempted from the adherence lint by path (see eslint.adherence.config.mjs)
+ * rather than by an inline disable comment, so the exemption is declared in one
+ * visible place instead of hiding at the top of a file.
  *
  * Three contexts cannot read a CSS custom property, so a token reference is
  * simply not available to them:
