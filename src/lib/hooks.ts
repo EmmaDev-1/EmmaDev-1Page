@@ -63,6 +63,74 @@ export function useScrolledPast(threshold: number): boolean {
   return passed;
 }
 
+type NavVisibilityOptions = {
+  /**
+   * Minimum movement, in px, before a direction change counts. Without it the
+   * bar flickers on trackpad jitter and on the rubber-band at the page ends.
+   */
+  threshold?: number;
+  /**
+   * Always show the bar within this many px of the top. The hero is the one
+   * place the bar should never be missing.
+   */
+  revealAbove?: number;
+};
+
+/**
+ * Hides the nav while the reader scrolls down and brings it back the moment
+ * they scroll up — the content gets the full viewport, but navigation is one
+ * gesture away rather than a trip to the top of the page.
+ *
+ * Reads scroll position inside requestAnimationFrame rather than in the event
+ * handler: `scrollY` is a layout-flushing read, and scroll fires far more often
+ * than the screen repaints.
+ */
+export function useNavVisibility({
+  threshold = 8,
+  revealAbove = 96,
+}: NavVisibilityOptions = {}): boolean {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      // Clamp: iOS overscroll reports positions past both ends of the document,
+      // which would otherwise read as a direction change on release.
+      const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const y = Math.min(Math.max(window.scrollY, 0), maxY);
+      const delta = y - lastY;
+
+      if (y <= revealAbove) {
+        setVisible(true);
+      } else if (delta > threshold) {
+        setVisible(false);
+      } else if (delta < -threshold) {
+        setVisible(true);
+      }
+
+      // Only advance the reference point once the movement was big enough to
+      // act on, so a slow drag accumulates instead of being discarded.
+      if (Math.abs(delta) > threshold) lastY = y;
+    };
+
+    const onScroll = () => {
+      if (frame === 0) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frame !== 0) cancelAnimationFrame(frame);
+    };
+  }, [threshold, revealAbove]);
+
+  return visible;
+}
+
 /** Mirrors the user's reduced-motion setting, and keeps mirroring it if it changes. */
 export function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);

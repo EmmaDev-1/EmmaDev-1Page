@@ -10,7 +10,7 @@ import {
   SocialIconLink,
 } from '@/components/design-system';
 import { navItems, profile, SECTION_IDS } from '@/content';
-import { useBodyScrollLock, useScrolledPast, useScrollSpy } from '@/lib/hooks';
+import { useBodyScrollLock, useNavVisibility, useScrolledPast, useScrollSpy } from '@/lib/hooks';
 
 /**
  * Everything around the page content: the sticky bar, the mobile drawer, the
@@ -33,6 +33,8 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
   // The arrow should not sit over the hero, so it waits for the first screenful.
   const scrolled = useScrolledPast(600);
+
+  const navVisible = useNavVisibility();
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
@@ -62,9 +64,22 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       {/*
         The wrapper owns the stickiness: NavBar carries `position: sticky`
         inline, which inside a same-height wrapper is a no-op, so hiding the
-        wrapper below 768px cannot break the sticking behaviour.
+        wrapper below 768px cannot break the sticking behaviour. It also owns
+        the hide-on-scroll transform, for the same reason — the vendored
+        component sets its own `transform`-free inline styles and stays
+        untouched.
+
+        `focus-within` overrides the hidden state: the links keep their place in
+        the tab order while the bar is off-screen, and a keyboard user must be
+        able to see what they have just focused.
       */}
-      <div className="sticky top-0 z-[100] hidden nav:block">
+      <div
+        data-testid="navbar"
+        data-visible={navVisible}
+        className={`sticky top-0 z-[100] hidden transition-transform duration-normal ease-standard nav:block focus-within:translate-y-0 ${
+          navVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
         <NavBar
           items={navItems}
           activeHref={activeHref}

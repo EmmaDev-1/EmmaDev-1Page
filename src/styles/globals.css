@@ -116,6 +116,10 @@
   --shadow-glow-ember: var(--glow-ember-md);
 
   /* ---- Motion ---- */
+  --duration-fast: var(--dur-fast);
+  --duration-normal: var(--dur-normal);
+  --duration-slow: var(--dur-slow);
+
   --ease-standard: var(--ease-standard);
   --ease-out-soft: var(--ease-out-soft);
   --ease-out-expo: var(--ease-out-expo);

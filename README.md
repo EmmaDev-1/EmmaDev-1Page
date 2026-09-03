@@ -1,7 +1,6 @@
 # EmmaDev — Portfolio
 
-Personal portfolio of **Emmanuel**, a software engineer working mainly in Flutter/Dart mobile
-development and Java/C# business systems.
+Personal portfolio of **Emmanuel**, a FrontEnd Engineer building mobile apps with Flutter and Dart.
 
 Built on **Next.js 16** (App Router) with **Tailwind CSS 4**, rendered against the
 [EmmaDev Design System](https://claude.ai/design/p/f8aaf116-77f9-48b3-94f6-67f289ec2f1e).
@@ -123,8 +122,9 @@ one-line change in `src/content/` if wanted:
   technologies and inventing a stack would be a fabrication.
 - The CV lists four newer projects — Colorinfinity, Bineo (Banorte), Dyshez and Habitan-t — that the
   Projects section does not yet show. Adding them needs screenshots or recordings.
-- `profile.role` is still `Software Engineer`, matching the hero line and the degree, while every
-  CV job title is `Flutter Developer`.
+- `profile.role` and the hero line both read `FrontEnd Engineer` — the author's chosen positioning.
+  It is deliberately neither the degree (`Software Engineering`, on `profile.education`) nor the CV's
+  per-role job title (`Flutter Developer`, on each Experience entry).
 - The CV's contact details (email, phone) are deliberately **not** rendered into the page HTML. They
   are in the downloadable PDF, but putting them in markup invites scrapers.
 

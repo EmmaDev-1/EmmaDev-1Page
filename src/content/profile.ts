@@ -21,7 +21,7 @@ export const profile: Profile = profileSchema.parse({
    * Experience entries and on `education` respectively.
    */
   role: 'FrontEnd Engineer',
-  headline: "Hi, I'm Emmanuel a Software Engineer",
+  headline: "Hi, I'm Emmanuel a FrontEnd Engineer",
   aboutHeading: 'Hi, nice to meet you',
   /*
    * One clause changed from the source: "As a software engineer with

@@ -14,7 +14,7 @@ test.describe('portfolio', () => {
     // The source used <h2> for the hero and had no h1 anywhere on the page.
     const h1 = page.locator('h1');
     await expect(h1).toHaveCount(1);
-    await expect(h1).toContainText("Hi, I'm Emmanuel a Software Engineer");
+    await expect(h1).toContainText("Hi, I'm Emmanuel a FrontEnd Engineer");
   });
 
   test('renders all eight projects', async ({ page }) => {
@@ -67,6 +67,63 @@ test.describe('desktop navigation', () => {
     // The active link keeps the gradient underline; colour is the tell.
     const projectsLink = page.locator('header a[href="#projects"]');
     await expect(projectsLink).toBeVisible();
+  });
+
+  test.describe('hide on scroll', () => {
+    /** Wheel events rather than scrollTo: the hook reads direction, not position. */
+    const wheel = async (page: import('@playwright/test').Page, dy: number) => {
+      await page.mouse.wheel(0, dy);
+      // One frame for the rAF read, plus the transform transition.
+      await page.waitForTimeout(450);
+    };
+
+    test('stays visible at the top of the page', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.getByTestId('navbar')).toHaveAttribute('data-visible', 'true');
+    });
+
+    test('hides on the way down and returns on the way up', async ({ page }) => {
+      await page.goto('/');
+      const navbar = page.getByTestId('navbar');
+
+      await wheel(page, 1200);
+      await expect(navbar).toHaveAttribute('data-visible', 'false');
+
+      // Off-screen, not merely transparent — assert the box actually moved out.
+      const hidden = await navbar.boundingBox();
+      expect(hidden).not.toBeNull();
+      expect(hidden!.y + hidden!.height).toBeLessThanOrEqual(0);
+
+      await wheel(page, -300);
+      await expect(navbar).toHaveAttribute('data-visible', 'true');
+
+      const shown = await navbar.boundingBox();
+      expect(shown!.y).toBeGreaterThanOrEqual(0);
+    });
+
+    test('comes back when the reader returns to the top', async ({ page }) => {
+      await page.goto('/');
+      await wheel(page, 1500);
+      await expect(page.getByTestId('navbar')).toHaveAttribute('data-visible', 'false');
+
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+      await page.waitForTimeout(450);
+      await expect(page.getByTestId('navbar')).toHaveAttribute('data-visible', 'true');
+    });
+
+    test('reveals itself when a link inside it takes focus', async ({ page }) => {
+      await page.goto('/');
+      await wheel(page, 1200);
+      await expect(page.getByTestId('navbar')).toHaveAttribute('data-visible', 'false');
+
+      // A keyboard user must be able to see the link they just tabbed to, even
+      // though the bar is off-screen and still in the tab order.
+      await page.locator('header a[href="#about"]').focus();
+      await page.waitForTimeout(450);
+
+      const box = await page.getByTestId('navbar').boundingBox();
+      expect(box!.y).toBeGreaterThanOrEqual(0);
+    });
   });
 });
 
