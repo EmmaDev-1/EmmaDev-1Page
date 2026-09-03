@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://emmadev.vercel.app';
 const description =
-  'Portfolio of Emmanuel, a software engineer building mobile apps in Flutter and Dart, and business systems in Java and C#.';
+  'Portfolio of Emmanuel, a frontend engineer building mobile apps with Flutter and Dart.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -38,15 +38,7 @@ export const metadata: Metadata = {
   applicationName: `${profile.name} Portfolio`,
   authors: [{ name: profile.name, url: SITE_URL }],
   creator: profile.name,
-  keywords: [
-    'software engineer',
-    'portfolio',
-    'Flutter',
-    'Dart',
-    'mobile development',
-    'Java',
-    'C#',
-  ],
+  keywords: ['frontend engineer', 'portfolio', 'Flutter', 'Dart', 'mobile development', 'C#'],
   openGraph: {
     type: 'website',
     url: SITE_URL,

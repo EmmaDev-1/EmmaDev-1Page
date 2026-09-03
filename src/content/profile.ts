@@ -11,7 +11,16 @@ import { profileSchema, type Profile } from './schema';
  */
 export const profile: Profile = profileSchema.parse({
   name: 'Emmanuel',
-  role: 'Software Engineer',
+  /*
+   * The professional title, as the author wants to be positioned. It is the
+   * hero eyebrow, the nav wordmark, the page <title>, the OG card and the
+   * JSON-LD jobTitle — one value, nine places, so it is only ever changed here.
+   *
+   * Note this is deliberately not the CV's per-role job title ("Flutter
+   * Developer") nor the degree ("Software Engineering"); those live on the
+   * Experience entries and on `education` respectively.
+   */
+  role: 'FrontEnd Engineer',
   headline: "Hi, I'm Emmanuel a Software Engineer",
   aboutHeading: 'Hi, nice to meet you',
   /*
