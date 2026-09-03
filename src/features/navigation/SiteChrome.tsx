@@ -6,15 +6,14 @@ import {
   NavBar,
   NavPanel,
   NavToggle,
-  ScrollTopArrow,
   SocialIconLink,
 } from '@/components/design-system';
 import { navItems, profile, SECTION_IDS } from '@/content';
-import { useBodyScrollLock, useNavVisibility, useScrolledPast, useScrollSpy } from '@/lib/hooks';
+import { useBodyScrollLock, useNavVisibility, useScrollSpy } from '@/lib/hooks';
 
 /**
- * Everything around the page content: the sticky bar, the mobile drawer, the
- * cursor trail and the back-to-top arrow.
+ * Everything around the page content: the sticky bar, the mobile drawer and
+ * the cursor trail.
  *
  * This is the only stateful shell in the app. `children` arrives already
  * rendered from the server, so wrapping the page in a client component costs
@@ -30,9 +29,6 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const sectionIds = useMemo(() => Object.values(SECTION_IDS), []);
   const activeId = useScrollSpy(sectionIds, SECTION_IDS.home);
   const activeHref = `#${activeId}`;
-
-  // The arrow should not sit over the hero, so it waits for the first screenful.
-  const scrolled = useScrolledPast(600);
 
   const navVisible = useNavVisibility();
 
@@ -104,9 +100,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             toggle is a 44px control sitting 20px down, and `-translate-y-full`
             would move it by its own height only — leaving it half on screen.
 
-            So it takes the treatment the design system already gives its other
-            floating fixed control, ScrollTopArrow: fade out over a short 12px
-            rise. `pointer-events-none` stops it swallowing taps while
+            So it takes the design system's fade-and-rise treatment for
+            floating fixed controls: fade out over a short 12px rise.
+            `pointer-events-none` stops it swallowing taps while
             invisible, and `focus-within` brings it back for keyboard users,
             since it keeps its place in the tab order either way.
 
@@ -151,11 +147,6 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       </div>
 
       <main id="main">{children}</main>
-
-      {/* Hidden on small screens, matching the source's mobile CSS. */}
-      <div className="hidden nav:block">
-        <ScrollTopArrow href={`#${SECTION_IDS.home}`} assetBase="/icons" visible={scrolled} />
-      </div>
 
       <CursorTrail />
     </>

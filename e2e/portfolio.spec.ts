@@ -178,10 +178,12 @@ test.describe('mobile navigation', () => {
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
   });
 
-  test('hides the cursor trail and the back-to-top arrow', async ({ page }) => {
+  test('never mounts the cursor trail on a touch device', async ({ page }) => {
     await page.goto('/');
-    // The source zeroed the trail dots' size on mobile; here it never mounts.
-    await expect(page.getByRole('link', { name: 'Back to top' })).toBeHidden();
+    // CursorTrail checks (hover:hover) and (pointer:fine) and renders null
+    // when neither matches, rather than rendering dots and hiding them.
+    const dotCount = await page.locator('body > div[aria-hidden="true"] > span').count();
+    expect(dotCount).toBe(0);
   });
 
   test.describe('toggle hides on scroll', () => {

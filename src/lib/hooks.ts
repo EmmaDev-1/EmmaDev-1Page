@@ -46,23 +46,6 @@ export function useScrollSpy(ids: readonly string[], fallback: string): string {
   return active;
 }
 
-/**
- * True once the user has scrolled past `threshold` pixels.
- * Drives the back-to-top arrow, which should not appear over the hero.
- */
-export function useScrolledPast(threshold: number): boolean {
-  const [passed, setPassed] = useState(false);
-
-  useEffect(() => {
-    const update = () => setPassed(window.scrollY > threshold);
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    return () => window.removeEventListener('scroll', update);
-  }, [threshold]);
-
-  return passed;
-}
-
 type NavVisibilityOptions = {
   /**
    * Minimum movement, in px, before a direction change counts. Without it the
