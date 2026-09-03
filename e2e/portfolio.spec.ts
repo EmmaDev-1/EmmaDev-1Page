@@ -162,6 +162,76 @@ test.describe('mobile navigation', () => {
     await expect(page.getByRole('link', { name: 'Back to top' })).toBeHidden();
   });
 
+  test.describe('toggle hides on scroll', () => {
+    const wheel = async (page: import('@playwright/test').Page, dy: number) => {
+      await page.mouse.wheel(0, dy);
+      await page.waitForTimeout(450);
+    };
+
+    /**
+     * Playwright treats an opacity-0 element as visible, so `toBeVisible` would
+     * pass either way here. Assert the opacity the user actually perceives.
+     */
+    const opacityOf = (page: import('@playwright/test').Page) =>
+      page
+        .getByTestId('nav-toggle')
+        .evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
+
+    test('is visible at the top of the page', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.getByTestId('nav-toggle')).toHaveAttribute('data-visible', 'true');
+      expect(await opacityOf(page)).toBe(1);
+    });
+
+    test('fades out on the way down and back in on the way up', async ({ page }) => {
+      await page.goto('/');
+      const toggle = page.getByTestId('nav-toggle');
+
+      await wheel(page, 1200);
+      await expect(toggle).toHaveAttribute('data-visible', 'false');
+      expect(await opacityOf(page)).toBe(0);
+
+      await wheel(page, -300);
+      await expect(toggle).toHaveAttribute('data-visible', 'true');
+      expect(await opacityOf(page)).toBe(1);
+    });
+
+    test('sits on a glass disc so it stays legible over light content', async ({ page }) => {
+      // NavToggle's bars are pure white on a transparent button; over the About
+      // portrait that is white on white.
+      await page.goto('/');
+      const background = await page
+        .getByTestId('nav-toggle')
+        .evaluate((el) => getComputedStyle(el).backgroundColor);
+
+      expect(background).not.toBe('rgba(0, 0, 0, 0)');
+      expect(background).not.toBe('transparent');
+    });
+
+    test('does not swallow taps while it is invisible', async ({ page }) => {
+      await page.goto('/');
+      await wheel(page, 1200);
+      await expect(page.getByTestId('nav-toggle')).toHaveAttribute('data-visible', 'false');
+
+      const pointerEvents = await page
+        .getByTestId('nav-toggle')
+        .evaluate((el) => getComputedStyle(el).pointerEvents);
+      expect(pointerEvents).toBe('none');
+    });
+
+    test('reveals itself when it takes focus', async ({ page }) => {
+      await page.goto('/');
+      await wheel(page, 1200);
+      await expect(page.getByTestId('nav-toggle')).toHaveAttribute('data-visible', 'false');
+
+      // It stays in the tab order while invisible, so focusing it must bring it
+      // back — otherwise a keyboard user is on a control they cannot see.
+      await page.getByRole('button', { name: 'Open menu' }).focus();
+      await page.waitForTimeout(450);
+      expect(await opacityOf(page)).toBe(1);
+    });
+  });
+
   test('keeps the drawer social links on screen', async ({ page }) => {
     // The vendored panel is height:100%, which overflows the visible area on
     // mobile browsers with retracting toolbars and hides the footer.

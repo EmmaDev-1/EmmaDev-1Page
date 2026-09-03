@@ -95,7 +95,34 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         the drawer's own × is the single close affordance.
       */}
       {menuOpen ? null : (
-        <div className="fixed top-5 left-5 z-[200] nav:hidden">
+        <div
+          data-testid="nav-toggle"
+          data-visible={navVisible}
+          /*
+            Same scroll rule as the desktop bar, but not the same motion. The
+            bar spans the viewport, so sliding it fully out is natural; the
+            toggle is a 44px control sitting 20px down, and `-translate-y-full`
+            would move it by its own height only — leaving it half on screen.
+
+            So it takes the treatment the design system already gives its other
+            floating fixed control, ScrollTopArrow: fade out over a short 12px
+            rise. `pointer-events-none` stops it swallowing taps while
+            invisible, and `focus-within` brings it back for keyboard users,
+            since it keeps its place in the tab order either way.
+
+            The glass disc is not decoration. NavToggle draws pure white bars on
+            a transparent button, so wherever it lands on light content — most
+            of the About portrait — it simply disappears. Now that it reappears
+            at whatever scroll position the reader stops at, that stopped being
+            a corner case. This is the design system's own rule for fixed bars:
+            --surface-glass behind --blur-glass, with a hairline border.
+          */
+          className={`fixed top-5 left-5 z-[200] rounded-pill border border-hairline bg-surface-glass backdrop-blur-[var(--blur-glass)] transition-[opacity,transform] duration-normal ease-standard nav:hidden focus-within:pointer-events-auto focus-within:translate-y-0 focus-within:opacity-100 ${
+            navVisible
+              ? 'translate-y-0 opacity-100'
+              : 'pointer-events-none -translate-y-3 opacity-0'
+          }`}
+        >
           <NavToggle open={false} onClick={toggleMenu} />
         </div>
       )}
