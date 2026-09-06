@@ -19,6 +19,24 @@ describe('content invariants', () => {
     expect(profile.social.length).toBeGreaterThan(0);
   });
 
+  it('keeps the curated project running order', () => {
+    // The array position drives the displayed index and the left/right
+    // alternation, so a reshuffle is a visible change, not a detail.
+    expect(projects.map((p) => p.id)).toEqual([
+      'colorinfinity',
+      'ditto-kids',
+      'ditto-kids-dashboard',
+      'pay',
+      'pokedex',
+      'my-weather',
+      'wappi-food',
+      'huble',
+      'my-notes',
+      'casa-padi',
+      'osc-compliance',
+    ]);
+  });
+
   it('lists experience most recent first', () => {
     // The CV's order is the intended reading order; a reshuffle should fail.
     expect(experience.map((role) => role.id)).toEqual(['pai', 'greelow', 'dyshez', 'gintec-aply']);

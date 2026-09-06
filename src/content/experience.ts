@@ -24,7 +24,16 @@ export const experience: Experience[] = experienceSchema.array().parse([
       'On a day-to-day basis, I set up projects with all the necessary infrastructure to ensure quality.',
       'I hold meetings with clients, teams, and PMs for the implementation of new features.',
     ],
-    stack: ['Flutter', 'Dart'],
+    /*
+     * NextJS, CI-CD and Store deploys were added at the author's request. They
+     * sit on this role because it is the one the evidence supports: his own
+     * bullet above says he sets up projects with "all the necessary
+     * infrastructure to ensure quality", which is what CI-CD and release
+     * pipelines are, and he places his Next.js work in the last year — this
+     * role's span. Not spread across the other three, which would be inventing
+     * a work history.
+     */
+    stack: ['Flutter', 'Dart', 'NextJS', 'CI-CD', 'Store deploys'],
   },
   {
     id: 'greelow',
@@ -57,6 +66,11 @@ export const experience: Experience[] = experienceSchema.array().parse([
       'As a project lead with a small but dynamic team specializing in mobile app development.',
       'Our focus was working closely with the client and UI/UX designer, generating weekly deliveries and ensuring process quality and efficiency.',
     ],
-    stack: ['Flutter', 'Dart'],
+    /*
+     * Store deploys is evidenced directly: the CV credits him with "the final
+     * app-release process for publication on the Google Play Store" for Huble,
+     * and Huble's listing is com.gintec.hublee — a Gintec package.
+     */
+    stack: ['Flutter', 'Dart', 'Store deploys'],
   },
 ] satisfies Experience[]);
