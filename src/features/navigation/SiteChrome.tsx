@@ -1,27 +1,29 @@
 'use client';
 
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import {
-  CursorTrail,
-  NavBar,
-  NavPanel,
-  NavToggle,
-  SocialIconLink,
-} from '@/components/design-system';
-import { navItems, profile, SECTION_IDS } from '@/content';
+import { CursorTrail, NavToggle } from '@/components/design-system';
+import { SECTION_IDS } from '@/content';
 import { useBodyScrollLock, useNavVisibility, useScrollSpy } from '@/lib/hooks';
+import { MobileMenu } from './MobileMenu';
+import { ScrollProgress } from './ScrollProgress';
+import { SectionRail } from './SectionRail';
+import { TopBar } from './TopBar';
 
 /**
- * Everything around the page content: the sticky bar, the mobile drawer and
- * the cursor trail.
+ * Everything around the page content.
  *
- * This is the only stateful shell in the app. `children` arrives already
- * rendered from the server, so wrapping the page in a client component costs
- * nothing — the sections themselves never ship to the browser.
+ * Navigation is now three coordinated affordances rather than one bar:
  *
- * The desktop bar and the mobile toggle are swapped with wrapper elements
- * rather than props: the design system components set `display` inline, and an
- * inline style always beats a utility class.
+ *   - TopBar — where you can go. Transparent over the hero, glass past it.
+ *   - SectionRail — where you are, readable at a glance without stopping to
+ *     read words. Wide screens only.
+ *   - ScrollProgress — how far through you are.
+ *
+ * On phones the rail and bar both give way to a full-screen menu, since the
+ * same information does not fit in a 390px gutter.
+ *
+ * `children` arrives already rendered from the server, so this being a client
+ * component costs nothing beyond the chrome itself.
  */
 export function SiteChrome({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,86 +33,66 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const activeHref = `#${activeId}`;
 
   const navVisible = useNavVisibility();
+  /* The bar earns its glass once the hero is no longer what is behind it. */
+  const condensed = activeId !== SECTION_IDS.home;
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
 
   useBodyScrollLock(menuOpen);
 
-  const socialLinks = profile.social.map((link) => (
-    <SocialIconLink
-      key={link.network}
-      network={link.network}
-      href={link.href}
-      label={link.label}
-      assetBase="/icons"
-      size={26}
-    />
-  ));
-
   return (
     <>
+      <ScrollProgress />
+
       <a
-        href={`#${SECTION_IDS.about}`}
+        href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[10000] focus:rounded-pill focus:bg-accent focus:px-5 focus:py-3 focus:text-on-accent"
       >
         Skip to content
       </a>
 
       {/*
-        The wrapper owns the stickiness: NavBar carries `position: sticky`
-        inline, which inside a same-height wrapper is a no-op, so hiding the
-        wrapper below 768px cannot break the sticking behaviour. It also owns
-        the hide-on-scroll transform, for the same reason — the vendored
-        component sets its own `transform`-free inline styles and stays
-        untouched.
+        Fixed rather than sticky, which is what lets the bar be transparent
+        over the hero at all: a sticky bar keeps its box in the flow, so the
+        hero would start 77px down, never fill the viewport, and push its own
+        scroll cue below the fold. Fixed takes it out of the flow and the hero
+        runs edge to edge underneath it.
 
-        `focus-within` overrides the hidden state: the links keep their place in
-        the tab order while the bar is off-screen, and a keyboard user must be
-        able to see what they have just focused.
+        Anchor landings are unaffected — `scroll-padding-top` on <html> is what
+        clears the bar, and that is independent of how the bar is positioned.
+
+        The wrapper also owns the hide-on-scroll transform, leaving the bar free
+        to animate its own background. `focus-within` overrides the hidden
+        state so a keyboard user always sees the link they just focused.
       */}
       <div
         data-testid="navbar"
         data-visible={navVisible}
-        className={`sticky top-0 z-[100] hidden transition-transform duration-normal ease-standard nav:block focus-within:translate-y-0 ${
+        className={`fixed inset-x-0 top-0 z-[200] hidden transition-transform duration-normal ease-standard nav:block focus-within:translate-y-0 ${
           navVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        <NavBar
-          items={navItems}
-          activeHref={activeHref}
-          brand={`${profile.name} — ${profile.role}`}
-          right={socialLinks}
-        />
+        <TopBar activeHref={activeHref} condensed={condensed} />
       </div>
 
+      <SectionRail activeHref={activeHref} />
+
       {/*
-        Only rendered while the drawer is closed. The drawer sits at z-index
-        9999 and covers the top-left corner, so an open-state toggle would be a
-        control the user can see morph into an X but cannot actually press —
-        the drawer's own × is the single close affordance.
+        Unmounted while the menu is open: the overlay sits above it, so an
+        open-state toggle would be a control the reader can see but not press.
+        The overlay carries its own close button.
       */}
       {menuOpen ? null : (
         <div
           data-testid="nav-toggle"
           data-visible={navVisible}
           /*
-            Same scroll rule as the desktop bar, but not the same motion. The
-            bar spans the viewport, so sliding it fully out is natural; the
-            toggle is a 44px control sitting 20px down, and `-translate-y-full`
-            would move it by its own height only — leaving it half on screen.
-
-            So it takes the design system's fade-and-rise treatment for
-            floating fixed controls: fade out over a short 12px rise.
-            `pointer-events-none` stops it swallowing taps while
-            invisible, and `focus-within` brings it back for keyboard users,
-            since it keeps its place in the tab order either way.
-
             The glass disc is not decoration. NavToggle draws pure white bars on
-            a transparent button, so wherever it lands on light content — most
-            of the About portrait — it simply disappears. Now that it reappears
-            at whatever scroll position the reader stops at, that stopped being
-            a corner case. This is the design system's own rule for fixed bars:
+            a transparent button, so anywhere it lands on light content — most
+            of the About portrait — it disappears. Since it reappears at
+            whatever scroll position the reader stops at, that is not a corner
+            case. This is the design system's rule for fixed bars:
             --surface-glass behind --blur-glass, with a hairline border.
           */
           className={`fixed top-5 left-5 z-[200] rounded-pill border border-hairline bg-surface-glass backdrop-blur-[var(--blur-glass)] transition-[opacity,transform] duration-normal ease-standard nav:hidden focus-within:pointer-events-auto focus-within:translate-y-0 focus-within:opacity-100 ${
@@ -123,28 +105,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <div className="nav:hidden">
-        <NavPanel
-          open={menuOpen}
-          items={navItems}
-          activeHref={activeHref}
-          onClose={closeMenu}
-          footer={socialLinks}
-          /*
-            The vendored panel is `height: 100%`, which resolves against the
-            initial containing block — on mobile browsers with retracting
-            toolbars that is taller than the visible area, and the footer's
-            social icons end up below the fold with no way to reach them.
-            `100dvh` tracks the actually-visible height instead.
-
-            Applied as a prop rather than an edit: the component spreads
-            `...style` last, so this overrides cleanly and the vendored file
-            stays byte-identical to upstream. Worth pushing back to the
-            design system.
-          */
-          style={{ height: '100dvh' }}
-        />
-      </div>
+      <MobileMenu open={menuOpen} activeHref={activeHref} onClose={closeMenu} />
 
       <main id="main">{children}</main>
 

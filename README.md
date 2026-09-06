@@ -41,15 +41,44 @@ src/
 ├── components/
 │   ├── design-system/       VENDORED — do not hand-edit
 │   │   └── index.ts         The only sanctioned import path
-│   └── ui/                  App-level components
-├── features/                One directory per page section
+│   ├── motion/              Reveal, Stagger, LineReveal, MotionProvider
+│   └── ui/                  Icon, Section, ProjectMedia, PersonJsonLd
+├── features/                One directory per page section, plus navigation
 ├── content/                 Typed content + Zod schemas
-├── lib/                     Hooks and constants
+├── lib/                     motion.ts (DS motion vocabulary), hooks, brand
 └── styles/                  Tokens, Tailwind theme bridge, globals
 ```
 
-**Sections are Server Components.** Only the design system, the site chrome and the experience
-rail cross into the browser; the content itself never ships as JavaScript.
+### Motion
+
+`lib/motion.ts` is the single translation of the design system's motion tokens
+into values Motion can animate — durations, easing curves, the 120ms stagger step
+and the blur-out reveal. Components compose from it rather than inventing timings,
+which is what keeps a page this animated from drifting into a dozen private rhythms.
+
+Reduced motion is handled in two places, both needed: `MotionConfig reducedMotion="user"`
+covers Motion's inline/WAAPI animations, and the media query in `globals.css` covers the
+design system's own CSS hovers and continuous loops.
+
+### Navigation
+
+Three coordinated affordances rather than one bar — `TopBar` (where you can go,
+transparent over the hero and glass past it), `SectionRail` (where you are, wide
+screens only) and `ScrollProgress`. Below 768px all three give way to a
+full-screen `MobileMenu`.
+
+### What this costs
+
+Every section is now a Client Component. Scroll-linked animation needs the element's own
+scroll progress, which only exists in the browser, so the previous build's "sections never
+ship as JavaScript" no longer holds. Measured on the built page: **~278 KB of JavaScript
+transferred (gzip)**, against roughly 100 KB of Next.js baseline before this work.
+
+The content itself is still resolved and inlined at build time — the page is fully static,
+every route prerendered — and the 9.2 MB media budget is untouched. The trade was made
+deliberately in exchange for the motion; if it ever needs unwinding, the seam is
+`components/motion/`, and the sections would go back to Server Components by dropping
+scroll-linked values for CSS-only reveals.
 
 ### The design system is vendored, not forked
 
@@ -65,12 +94,21 @@ Two mechanisms keep it honest:
 
 Deviations from upstream are applied as **props**, never as edits — the vendored components spread
 `...style` last, so overriding is possible without touching the file. Each one carries a comment
-explaining why. There are currently two, both worth pushing back upstream:
+explaining why:
 
-1. `NavPanel` is given `height: 100dvh` (upstream is `100%`, which hides the footer on mobile
-   browsers with retracting toolbars).
-2. `tokens/fonts.css` is not vendored at all — it loads both faces from the Google CDN. `next/font`
+1. `tokens/fonts.css` is not vendored at all — it loads both faces from the Google CDN. `next/font`
    self-hosts them instead, and `globals.css` re-binds `--font-core` / `--font-mono`.
+2. **Icons.** The DS ships three PNGs and two unicode glyphs, and its README asks to consult the
+   author before adding a library, warning that Lucide "would immediately look borrowed". That
+   question was put to him and he chose Lucide. `components/ui/Icon.tsx` keeps it from sprawling:
+   an explicit allowlist, and a 1.5 stroke on 20px so it sits with the type rather than shouting
+   over it. Social marks stay as the DS's own PNGs.
+3. **Compositions.** `NavBar`, `NavPanel` and `ProjectRow` are no longer consumed — each fixes a
+   layout and its own entrance, which a scroll-linked composition cannot take part in. Their visual
+   grammar is reproduced exactly from the same tokens; `NavLink`, `TagChip`, `Button`,
+   `SectionHeading`, `BlobPortrait`, `ResumePreview`, `GradientText`, `MediaCarousel`, `NavToggle`
+   and `CursorTrail` are still the real components. All of them stay exported, since `ds:sync`
+   requires every manifest component to be present and reachable.
 
 Values that genuinely cannot use a token — the `theme-color` meta tag, the Satori-rendered OG
 image, an `IntersectionObserver` rootMargin — live in `src/lib/brand.ts`, the one file the

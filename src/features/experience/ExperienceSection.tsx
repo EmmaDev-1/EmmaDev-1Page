@@ -1,106 +1,125 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ExperienceCard, IconButton, Reveal, SectionHeading } from '@/components/design-system';
+import { motion, useScroll, useSpring, useTransform } from 'motion/react';
+import { useRef } from 'react';
+import { SectionHeading, TagChip } from '@/components/design-system';
+import { Reveal } from '@/components/motion/Reveal';
 import { Section } from '@/components/ui/Section';
 import { experience, SECTION_IDS } from '@/content';
+import { DURATION, EASE, reveal, VIEWPORT } from '@/lib/motion';
 
 /**
- * Experience carousel.
+ * Career timeline.
  *
- * The source carousel was driven by `currentIndex % (cards.length - 1)`, which
- * with three cards made the third one unreachable, and it measured card width
- * once at load so it broke on resize. This is a scroll-snap rail instead: the
- * browser owns the position, so touch, trackpad, keyboard and the ❮ / ❯ arrows
- * all agree, and there is no index arithmetic to get wrong.
+ * Replaces the horizontal scroll-snap rail. The rail was a faithful port of the
+ * source's carousel, but a carousel is the wrong shape for a career: it hides
+ * most of the history behind a gesture, gives every role equal weight, and says
+ * nothing about order. Four dated roles down a vertical line say "this is a
+ * progression" without a word of explanation.
  *
- * The arrows disable themselves when the rail is not actually overflowing,
- * which is the common case on a wide screen with three cards.
+ * The line fills as the section scrolls, which is the one place on the page
+ * where a scroll-linked value carries meaning rather than decoration — it is
+ * literally a progress bar through time.
  */
 export function ExperienceSection() {
-  const railRef = useRef<HTMLDivElement>(null);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
-  const [overflowing, setOverflowing] = useState(false);
-
-  const sync = useCallback(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    // 1px of slack absorbs sub-pixel scroll positions at fractional zoom.
-    const maxScroll = rail.scrollWidth - rail.clientWidth;
-    setOverflowing(maxScroll > 1);
-    setAtStart(rail.scrollLeft <= 1);
-    setAtEnd(rail.scrollLeft >= maxScroll - 1);
-  }, []);
-
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    sync();
-    rail.addEventListener('scroll', sync, { passive: true });
-    const resizeObserver = new ResizeObserver(sync);
-    resizeObserver.observe(rail);
-    return () => {
-      rail.removeEventListener('scroll', sync);
-      resizeObserver.disconnect();
-    };
-  }, [sync]);
-
-  const scrollByCard = useCallback((direction: -1 | 1) => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const firstCard = rail.firstElementChild;
-    // Fall back to a viewport-width nudge if the rail is somehow empty.
-    const step = firstCard instanceof HTMLElement ? firstCard.offsetWidth + 20 : rail.clientWidth;
-    rail.scrollBy({ left: direction * step, behavior: 'smooth' });
-  }, []);
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start 75%', 'end 60%'],
+  });
+  const scaleY = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 });
 
   return (
     <Section id={SECTION_IDS.experience}>
-      <div className="mb-16 flex items-end justify-between gap-6">
-        <SectionHeading eyebrow="03 — Career">Experience</SectionHeading>
+      <Reveal>
+        <SectionHeading eyebrow="03 — Career" className="mb-20">
+          Experience
+        </SectionHeading>
+      </Reveal>
 
-        {overflowing ? (
-          <div className="flex shrink-0 gap-3">
-            <IconButton
-              label="Previous experience"
-              glyph="❮"
-              disabled={atStart}
-              onClick={() => scrollByCard(-1)}
-              style={{ opacity: atStart ? 0.35 : 1 }}
-            />
-            <IconButton
-              label="Next experience"
-              glyph="❯"
-              disabled={atEnd}
-              onClick={() => scrollByCard(1)}
-              style={{ opacity: atEnd ? 0.35 : 1 }}
-            />
-          </div>
-        ) : null}
-      </div>
+      <div ref={ref} className="relative">
+        {/* The rail. Sits under the nodes, inset to the node's centre. */}
+        <div aria-hidden="true" className="timeline-rail bg-hairline" />
+        <motion.div
+          aria-hidden="true"
+          className="timeline-rail origin-top"
+          style={{ scaleY, background: 'var(--gradient-brand-vertical)' }}
+        />
 
-      <div
-        ref={railRef}
-        className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-4 nav:mx-0 nav:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {experience.map((role, index) => (
-          <Reveal
-            key={role.id}
-            delay={index * 120}
-            className="w-[var(--rail-card-width)] shrink-0 snap-start nav:w-auto nav:flex-1"
-          >
-            <ExperienceCard
-              org={role.org}
-              role={role.role}
-              period={role.period}
-              points={role.points}
-              stack={role.stack}
-              style={{ height: '100%' }}
-            />
-          </Reveal>
-        ))}
+        <ol className="m-0 flex list-none flex-col gap-16 p-0">
+          {experience.map((role, index) => (
+            <TimelineRole key={role.id} role={role} index={index} />
+          ))}
+        </ol>
       </div>
     </Section>
+  );
+}
+
+function TimelineRole({ role, index }: { role: (typeof experience)[number]; index: number }) {
+  const ref = useRef<HTMLLIElement>(null);
+  /*
+   * Each node lights up as it reaches the middle of the viewport, so the dot
+   * the gradient line has just passed is the one that is filled. Tying it to
+   * the node's own position rather than to a section-wide index keeps them in
+   * step at any scroll speed.
+   */
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 70%', 'start 45%'] });
+  const nodeScale = useTransform(scrollYProgress, [0, 1], [0.6, 1]);
+  const nodeOpacity = useTransform(scrollYProgress, [0, 1], [0.3, 1]);
+
+  return (
+    <motion.li
+      ref={ref}
+      className="timeline-row relative"
+      variants={reveal('up')}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT}
+      transition={{ duration: DURATION.reveal, ease: EASE.outSoft, delay: index * 0.06 }}
+    >
+      {/* Period column, which doubles as the timeline's left rail on desktop. */}
+      <div className="nav:pt-1 nav:text-right">
+        <span className="font-mono text-micro tracking-wide text-accent uppercase">
+          {role.period}
+        </span>
+      </div>
+
+      <motion.span
+        aria-hidden="true"
+        className="timeline-node rounded-pill border-2 border-page"
+        style={{ scale: nodeScale, opacity: nodeOpacity, background: 'var(--gradient-brand)' }}
+      />
+
+      {/* The grid gap already clears the rail; extra padding here just opened a
+          trench between the timeline and the text it belongs to. */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h3 className="m-0 text-heading-2 leading-snug text-heading">{role.org}</h3>
+          {role.role ? <span className="text-body-sm text-ink-300">{role.role}</span> : null}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {role.points.map((point) => (
+            <p
+              key={point}
+              className="m-0 max-w-[var(--measure-prose)] text-body-sm leading-relaxed text-ink-100 text-pretty"
+            >
+              {point}
+            </p>
+          ))}
+        </div>
+
+        {role.stack.length > 0 ? (
+          <ul className="m-0 flex list-none flex-wrap gap-2 p-0 pt-1">
+            {role.stack.map((tech) => (
+              <li key={tech}>
+                <TagChip>{tech}</TagChip>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </motion.li>
   );
 }

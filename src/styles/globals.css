@@ -163,6 +163,12 @@
   --nav-height: 72px;
   --media-max-height: 560px;
   --rail-card-width: min(85vw, 360px);
+
+  /* Career timeline geometry. See .timeline-* below. */
+  --timeline-gutter: 160px;
+  --timeline-node: 15px;
+  /* Centres a 1px rail under the node: (node − rail) / 2. */
+  --timeline-rail-offset: 7px;
 }
 
 @layer base {
@@ -228,6 +234,53 @@
 }
 
 @layer utilities {
+  /*
+    Career timeline geometry.
+
+    Kept in CSS rather than as arbitrary Tailwind values because it is pixel
+    arithmetic — the rail has to land on the centre of the node at two
+    breakpoints — and that arithmetic belongs next to the tokens it derives
+    from, not inlined into a className string.
+  */
+  .timeline-rail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--timeline-rail-offset);
+    width: 1px;
+  }
+
+  .timeline-node {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    width: var(--timeline-node);
+    height: var(--timeline-node);
+  }
+
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding-left: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .timeline-rail {
+      left: calc(var(--timeline-gutter) + var(--timeline-rail-offset));
+    }
+
+    .timeline-node {
+      left: var(--timeline-gutter);
+    }
+
+    .timeline-row {
+      grid-template-columns: var(--timeline-gutter) 1fr;
+      gap: var(--space-10);
+      padding-left: 0;
+    }
+  }
+
   /* The one background event the system allows: a soft brand bloom. */
   .bloom-hero {
     position: absolute;

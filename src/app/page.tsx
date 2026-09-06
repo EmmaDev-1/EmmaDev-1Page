@@ -1,5 +1,6 @@
 import { AboutSection } from '@/features/about/AboutSection';
 import { ExperienceSection } from '@/features/experience/ExperienceSection';
+import { SiteFooter } from '@/features/footer/SiteFooter';
 import { HeroSection } from '@/features/hero/HeroSection';
 import { SiteChrome } from '@/features/navigation/SiteChrome';
 import { ProjectsSection } from '@/features/projects/ProjectsSection';
@@ -20,6 +21,7 @@ export default function HomePage() {
         <ProjectsSection />
         <ExperienceSection />
         <ResumeSection />
+        <SiteFooter />
       </SiteChrome>
     </>
   );

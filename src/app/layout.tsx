@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Varela_Round } from 'next/font/google';
+import { MotionProvider } from '@/components/motion/MotionProvider';
 import { profile } from '@/content';
 import { BRAND_GRAPHITE } from '@/lib/brand';
 import '@/styles/globals.css';
@@ -69,7 +70,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${varelaRound.variable} ${jetbrainsMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

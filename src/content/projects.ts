@@ -14,6 +14,7 @@ import { projectSchema, type Project } from './schema';
 export const projects: Project[] = projectSchema.array().parse([
   {
     id: 'pay',
+    category: 'Mobile',
     title: 'Pay',
     description:
       'Pay is an simulation app for subscriptions, users have to authenticate to view their subscription information. I use Firebase auth providers, json simulation APIs, clean architecture, Riverpod, go router and clean code for this app',
@@ -23,6 +24,7 @@ export const projects: Project[] = projectSchema.array().parse([
   },
   {
     id: 'huble',
+    category: 'Mobile',
     title: 'Huble',
     description:
       'This is an app that was ideal created for schools. The objetive was to make the students have better habits by implementing a striking design.',
@@ -32,6 +34,7 @@ export const projects: Project[] = projectSchema.array().parse([
   },
   {
     id: 'wappi-food',
+    category: 'Mobile',
     title: 'Wappi Food',
     description:
       'Wappi is a Mobile app inspired in a delivery system. This app incorporates technologies like, Flutter, GPS sensor and Firebase Authentication. My main purpose with this project was to create a simple app with great UI-UX.',
@@ -41,6 +44,7 @@ export const projects: Project[] = projectSchema.array().parse([
   },
   {
     id: 'my-weather',
+    category: 'Mobile',
     title: 'My Weather',
     description:
       'My weather is a mobile app that users can consult the weather of any city of the world, incorporates real time data, validation system, and a smooth user experience.',
@@ -50,6 +54,7 @@ export const projects: Project[] = projectSchema.array().parse([
   },
   {
     id: 'my-notes',
+    category: 'Mobile',
     title: 'My Notes',
     description:
       'My Notes is a mobile app that users can create notes based on priority and a time limit, when the user finished the given task they can mark the note as finish and then archive the note or delete it. Incorporates real time data, validation system and a smooth user experience.',
@@ -59,6 +64,7 @@ export const projects: Project[] = projectSchema.array().parse([
   },
   {
     id: 'pokedex',
+    category: 'Mobile',
     title: 'Pokedex',
     description:
       'Pokedex is a mobile app inspired in the Pokemon world, you can find a variety of Pokemon species, items and regions. Incorporates big real time data and a smooth feeling to the user experience.',
@@ -68,6 +74,7 @@ export const projects: Project[] = projectSchema.array().parse([
   },
   {
     id: 'casa-padi',
+    category: 'Web',
     title: 'Casa Padi',
     description:
       'Web system riquierd for an art school, designed to be simple and minimalistic. The main objetive was to create a page for user to manage theire information of classes, Teachers can creating new classes and Admins can manage information for all types of users.',
@@ -85,6 +92,7 @@ export const projects: Project[] = projectSchema.array().parse([
   },
   {
     id: 'osc-compliance',
+    category: 'Web',
     title: 'OSC Compliance',
     description:
       'An organization riquierd a web system inspired by the Business Model Canvas, the objective was that it could provide a deep educacion in sectors like finances, technical and fiscals for other civil organization.',

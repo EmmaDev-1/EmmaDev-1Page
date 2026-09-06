@@ -1,4 +1,37 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+/**
+ * Scrolls until the chrome element reaches `expected`, nudging repeatedly.
+ *
+ * A single wheel plus a fixed wait is not reliable here. The very first wheel
+ * of a test can land before React has hydrated: the scroll happens, but
+ * useNavVisibility's listener does not exist yet, so it initialises at the
+ * already-scrolled position with a delta of zero and never sees the movement.
+ * Under a loaded machine — the full suite runs several of these animated pages
+ * at once — that window is wide enough to matter.
+ *
+ * Nudging until the state flips tests the real contract ("scrolling this way
+ * hides it") without encoding a guess about how long hydration takes.
+ */
+async function scrollUntil(
+  page: Page,
+  testId: string,
+  expected: 'true' | 'false',
+  dy: number,
+): Promise<void> {
+  await expect
+    .poll(
+      async () => {
+        const value = await page.getByTestId(testId).getAttribute('data-visible');
+        if (value === expected) return value;
+        await page.mouse.wheel(0, dy);
+        await page.waitForTimeout(220);
+        return page.getByTestId(testId).getAttribute('data-visible');
+      },
+      { timeout: 10_000 },
+    )
+    .toBe(expected);
+}
 
 /**
  * End-to-end checks for the things that were actually broken before the
@@ -92,13 +125,6 @@ test.describe('desktop navigation', () => {
   });
 
   test.describe('hide on scroll', () => {
-    /** Wheel events rather than scrollTo: the hook reads direction, not position. */
-    const wheel = async (page: import('@playwright/test').Page, dy: number) => {
-      await page.mouse.wheel(0, dy);
-      // One frame for the rAF read, plus the transform transition.
-      await page.waitForTimeout(450);
-    };
-
     test('stays visible at the top of the page', async ({ page }) => {
       await page.goto('/');
       await expect(page.getByTestId('navbar')).toHaveAttribute('data-visible', 'true');
@@ -108,16 +134,14 @@ test.describe('desktop navigation', () => {
       await page.goto('/');
       const navbar = page.getByTestId('navbar');
 
-      await wheel(page, 1200);
-      await expect(navbar).toHaveAttribute('data-visible', 'false');
+      await scrollUntil(page, 'navbar', 'false', 1200);
 
       // Off-screen, not merely transparent — assert the box actually moved out.
       const hidden = await navbar.boundingBox();
       expect(hidden).not.toBeNull();
       expect(hidden!.y + hidden!.height).toBeLessThanOrEqual(0);
 
-      await wheel(page, -300);
-      await expect(navbar).toHaveAttribute('data-visible', 'true');
+      await scrollUntil(page, 'navbar', 'true', -300);
 
       const shown = await navbar.boundingBox();
       expect(shown!.y).toBeGreaterThanOrEqual(0);
@@ -125,8 +149,7 @@ test.describe('desktop navigation', () => {
 
     test('comes back when the reader returns to the top', async ({ page }) => {
       await page.goto('/');
-      await wheel(page, 1500);
-      await expect(page.getByTestId('navbar')).toHaveAttribute('data-visible', 'false');
+      await scrollUntil(page, 'navbar', 'false', 1500);
 
       await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
       await page.waitForTimeout(450);
@@ -135,8 +158,7 @@ test.describe('desktop navigation', () => {
 
     test('reveals itself when a link inside it takes focus', async ({ page }) => {
       await page.goto('/');
-      await wheel(page, 1200);
-      await expect(page.getByTestId('navbar')).toHaveAttribute('data-visible', 'false');
+      await scrollUntil(page, 'navbar', 'false', 1200);
 
       // A keyboard user must be able to see the link they just tabbed to, even
       // though the bar is off-screen and still in the tab order.
@@ -150,31 +172,33 @@ test.describe('desktop navigation', () => {
 });
 
 test.describe('mobile navigation', () => {
-  test.skip(({ isMobile }) => !isMobile, 'drawer only exists below 768px');
+  test.skip(({ isMobile }) => !isMobile, 'the menu only exists below 768px');
 
-  test('opens and closes the drawer', async ({ page }) => {
+  /** The full-screen menu, which replaced the side drawer. */
+  const menu = (page: Page) => page.getByRole('navigation', { name: 'Main' });
+
+  test('opens and closes the menu', async ({ page }) => {
     await page.goto('/');
 
     const toggle = page.getByRole('button', { name: 'Open menu' });
     await expect(toggle).toBeVisible();
     await toggle.click();
 
-    const panelLink = page.locator('aside a[href="#projects"]');
-    await expect(panelLink).toBeVisible();
+    await expect(menu(page).getByRole('link', { name: 'Projects' })).toBeVisible();
 
-    // The hamburger is unmounted while the drawer is open, so the drawer's own
-    // × is the only close control — and the only one that is actually clickable,
-    // since the drawer covers the corner the hamburger occupies.
+    // The hamburger is unmounted while the menu is open, so the overlay's own
+    // close button is the only way out — and the only one that could be
+    // clickable, since the overlay covers the corner the hamburger occupies.
     await expect(page.getByRole('button', { name: 'Open menu' })).toHaveCount(0);
 
-    await page.locator('aside button[aria-label="Close menu"]').click();
+    await page.getByRole('button', { name: 'Close menu' }).click();
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
   });
 
-  test('closes the drawer when a link is followed', async ({ page }) => {
+  test('closes the menu when a link is followed', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Open menu' }).click();
-    await page.locator('aside a[href="#projects"]').click();
+    await menu(page).getByRole('link', { name: 'Projects' }).click();
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
   });
 
@@ -187,37 +211,42 @@ test.describe('mobile navigation', () => {
   });
 
   test.describe('toggle hides on scroll', () => {
-    const wheel = async (page: import('@playwright/test').Page, dy: number) => {
-      await page.mouse.wheel(0, dy);
-      await page.waitForTimeout(450);
-    };
-
     /**
      * Playwright treats an opacity-0 element as visible, so `toBeVisible` would
      * pass either way here. Assert the opacity the user actually perceives.
+     *
+     * Polled rather than read once: the fade is a 300ms transition, so a single
+     * read lands mid-transition whenever the machine is busy — which is exactly
+     * what happened when these ran alongside the rest of the suite instead of
+     * on their own.
      */
-    const opacityOf = (page: import('@playwright/test').Page) =>
-      page
-        .getByTestId('nav-toggle')
-        .evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
+    const expectOpacity = (page: Page, value: number) =>
+      expect
+        .poll(
+          () =>
+            page
+              .getByTestId('nav-toggle')
+              .evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity)),
+          { timeout: 4000 },
+        )
+        .toBe(value);
 
     test('is visible at the top of the page', async ({ page }) => {
       await page.goto('/');
       await expect(page.getByTestId('nav-toggle')).toHaveAttribute('data-visible', 'true');
-      expect(await opacityOf(page)).toBe(1);
+      await expectOpacity(page, 1);
     });
 
     test('fades out on the way down and back in on the way up', async ({ page }) => {
       await page.goto('/');
       const toggle = page.getByTestId('nav-toggle');
 
-      await wheel(page, 1200);
+      await scrollUntil(page, 'nav-toggle', 'false', 1200);
       await expect(toggle).toHaveAttribute('data-visible', 'false');
-      expect(await opacityOf(page)).toBe(0);
+      await expectOpacity(page, 0);
 
-      await wheel(page, -300);
-      await expect(toggle).toHaveAttribute('data-visible', 'true');
-      expect(await opacityOf(page)).toBe(1);
+      await scrollUntil(page, 'nav-toggle', 'true', -300);
+      await expectOpacity(page, 1);
     });
 
     test('sits on a glass disc so it stays legible over light content', async ({ page }) => {
@@ -234,8 +263,7 @@ test.describe('mobile navigation', () => {
 
     test('does not swallow taps while it is invisible', async ({ page }) => {
       await page.goto('/');
-      await wheel(page, 1200);
-      await expect(page.getByTestId('nav-toggle')).toHaveAttribute('data-visible', 'false');
+      await scrollUntil(page, 'nav-toggle', 'false', 1200);
 
       const pointerEvents = await page
         .getByTestId('nav-toggle')
@@ -245,24 +273,25 @@ test.describe('mobile navigation', () => {
 
     test('reveals itself when it takes focus', async ({ page }) => {
       await page.goto('/');
-      await wheel(page, 1200);
-      await expect(page.getByTestId('nav-toggle')).toHaveAttribute('data-visible', 'false');
+      await scrollUntil(page, 'nav-toggle', 'false', 1200);
 
       // It stays in the tab order while invisible, so focusing it must bring it
       // back — otherwise a keyboard user is on a control they cannot see.
       await page.getByRole('button', { name: 'Open menu' }).focus();
-      await page.waitForTimeout(450);
-      expect(await opacityOf(page)).toBe(1);
+      await expectOpacity(page, 1);
     });
   });
 
-  test('keeps the drawer social links on screen', async ({ page }) => {
-    // The vendored panel is height:100%, which overflows the visible area on
-    // mobile browsers with retracting toolbars and hides the footer.
+  test('keeps the menu social links on screen', async ({ page }) => {
+    // The menu is a full-viewport overlay, so its footer has to sit inside the
+    // visible area on browsers whose toolbars retract.
     await page.goto('/');
     await page.getByRole('button', { name: 'Open menu' }).click();
 
-    const linkedin = page.locator('aside a[aria-label="LinkedIn profile"]');
+    const linkedin = page
+      .locator('[class*="fixed"]')
+      .locator('a[aria-label="LinkedIn profile"]')
+      .last();
     await expect(linkedin).toBeVisible();
 
     const box = await linkedin.boundingBox();

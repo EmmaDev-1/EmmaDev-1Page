@@ -47,6 +47,13 @@ export const projectSchema = z.object({
   /** Stable key — also the anchor fragment. */
   id: nonEmpty.regex(/^[a-z0-9-]+$/, 'ids are lowercase kebab-case'),
   title: nonEmpty,
+  /**
+   * Drives the Projects filter. Read off each project's own description —
+   * every entry calls itself either a mobile app or a web system — rather
+   * than filtering on `stack`, which is empty for five of the eight and would
+   * make most filters return nothing.
+   */
+  category: z.enum(['Mobile', 'Web']),
   description: nonEmpty,
   media: mediaSchema,
   /**
@@ -82,8 +89,16 @@ export const educationSchema = z.object({
 export const profileSchema = z.object({
   name: nonEmpty,
   role: nonEmpty,
-  /** The hero line, verbatim from the source. */
+  /**
+   * The hero line, split at the breaks it should take on screen. The hero
+   * reveals each line from behind its own mask, so the split is content, not
+   * styling — a CSS-driven wrap would put the mask in the wrong place.
+   */
+  headlineLines: z.array(nonEmpty).min(1),
+  /** Derived from headlineLines, so the two cannot drift apart. */
   headline: nonEmpty,
+  /** One line under the headline. The design system's hero specifies one. */
+  tagline: nonEmpty,
   aboutHeading: nonEmpty,
   aboutBody: nonEmpty,
   education: educationSchema,

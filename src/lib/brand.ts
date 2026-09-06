@@ -51,3 +51,19 @@ export const OG_BLOOM_BLUR = 'blur(140px)';
  * of the viewport. Expressed as an IntersectionObserver rootMargin.
  */
 export const SCROLL_SPY_ROOT_MARGIN = '-45% 0px -45% 0px';
+
+/**
+ * The design system's reveal veil (--blur-veil) as a ready-made filter value.
+ */
+export const BLUR_VEIL = 'blur(5px)';
+
+/**
+ * The off state for any animated blur.
+ *
+ * It has to carry a unit. Interpolating a filter means matching the function
+ * list on both sides, so animating to a bare `0` — or to `none` — makes the
+ * blur snap off at the end of the transition instead of easing out. This is a
+ * mechanic of animating filters, not a design value, which is why there is no
+ * token for it.
+ */
+export const BLUR_NONE = 'blur(0px)';
