@@ -75,7 +75,8 @@ ship as JavaScript" no longer holds. Measured on the built page: **~278 KB of Ja
 transferred (gzip)**, against roughly 100 KB of Next.js baseline before this work.
 
 The content itself is still resolved and inlined at build time — the page is fully static,
-every route prerendered — and the 9.2 MB media budget is untouched. The trade was made
+every route prerendered — and the media budget stays well under a page load's worth (~15 MB
+across all eleven projects). The trade was made
 deliberately in exchange for the motion; if it ever needs unwinding, the seam is
 `components/motion/`, and the sections would go back to Server Components by dropping
 scroll-linked values for CSS-only reveals.
@@ -138,6 +139,23 @@ loaded eagerly. `pnpm media:build` re-encodes them:
 
 `Pokedex.gif` alone went from 35 MB to 3.3 MB.
 
+Three later projects — Colorinfinity, Ditto Kids and Ditto Kids Dashboard — added two MP4 sources
+and four screenshots, bringing the current total to **~15 MB** across all eleven projects.
+
+**MP4 sources need one more step than a GIF does.** `sharp` decodes GIF frames directly but cannot
+open a video container at all, so the pipeline extracts frame 0 through `ffmpeg` first and reads
+_that_ — an ordinary PNG — for both the source dimensions and the poster image. This generalises
+cleanly to either source type rather than special-casing one of them.
+
+**Every video job pins its output to 30fps**, GIF or MP4 alike. `ditto-kids.mp4` surfaced why:
+screen recorders can write variable-frame-rate footage with a nonsense nominal rate in the
+container header — this one reported 96.83 fps with its `tbr` equal to its own 90000 timebase,
+meaning ffmpeg had no real frame interval to infer at all. Converting that to a constant frame rate
+without pinning one made ffmpeg try to hit the bogus declared rate by duplicating frames to fill the
+gaps — confirmed by reproduction before the fix landed: 108,863 frames encoded to cover 1.2 seconds
+of timeline, and climbing. An explicit `-r 30` fixes it at the source for any future import, and
+costs the original six nothing — none of them approach 30fps natively.
+
 Masters stay in `assets/source/` and are never served. Output lands in `public/` and is committed,
 so deploys need no ffmpeg. Videos use `preload="none"` and only start once an `IntersectionObserver`
 says they are on screen — scrolling past a project costs nothing.
@@ -146,8 +164,14 @@ says they are on screen — scrolling past a project costs nothing.
 
 ## Known content notes
 
-**Experience**, **About Me** and the **CV** are sourced from `Emmanuel_Aguilar_CV.pdf`. The project
-copy is still the author's original wording from the old site.
+**Experience**, **About Me** and the **CV** are sourced from `Emmanuel_Aguilar_CV.pdf`. The
+original eight projects' copy is still the author's wording from the old site, verbatim.
+
+**Colorinfinity, Ditto Kids and Ditto Kids Dashboard** are newer projects the author described in
+his own words — what each product does and who it is for, not a polished description. Their prose
+in `src/content/projects.ts` is a rewrite of that description for clarity, not new information he
+did not supply; he reviewed and can amend it at any time. None of the three names a specific
+technology, so — consistent with the rule below for the original eight — none carries a `stack`.
 
 These were left as found because they are the author's own words, not refactor targets. Each is a
 one-line change in `src/content/` if wanted:
@@ -156,10 +180,10 @@ one-line change in `src/content/` if wanted:
   `educacion`, `an simulation`, `ideal created`.
 - Technology labels keep their source casing on purpose, in both the projects and the CV's own
   skills list: `Postgre SQL`, `Boostrap`, `FireBase`, `Javascript`, `Key Managment`, `MicrosoftSQL`.
-- Five of the eight projects have no technology chips, because their descriptions name no
+- Eight of the eleven projects have no technology chips, because their descriptions name no
   technologies and inventing a stack would be a fabrication.
-- The CV lists four newer projects — Colorinfinity, Bineo (Banorte), Dyshez and Habitan-t — that the
-  Projects section does not yet show. Adding them needs screenshots or recordings.
+- The CV also lists Bineo (Banorte), Dyshez and Habitan-t, which the Projects section does not yet
+  show. Adding them needs screenshots or recordings, the same as the three added here.
 - `profile.role` and the hero line both read `FrontEnd Engineer` — the author's chosen positioning.
   It is deliberately neither the degree (`Software Engineering`, on `profile.education`) nor the CV's
   per-role job title (`Flutter Developer`, on each Experience entry).

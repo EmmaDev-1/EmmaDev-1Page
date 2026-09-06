@@ -1,12 +1,19 @@
 import { projectSchema, type Project } from './schema';
 
 /**
- * The eight projects, in the order the source page listed them.
+ * The eight original projects, in the order the source page listed them, plus
+ * three added later — Colorinfinity, Ditto Kids and Ditto Kids Dashboard —
+ * appended rather than interleaved so the first eight anchors and their order
+ * stay exactly as they were.
  *
- * Copy is verbatim — including the author's own spellings. `stack` is filled
- * only where the project's own description names a technology; the rest are
- * left empty rather than inferred, because guessing someone's tech stack and
- * printing it on their portfolio is a fabrication, not a refactor.
+ * Copy for the original eight is verbatim — including the author's own
+ * spellings. `stack` is filled only where a project's own description names a
+ * technology; the rest are left empty rather than inferred, because guessing
+ * someone's tech stack and printing it on their portfolio is a fabrication,
+ * not a refactor. The same rule applies to the three newer entries: the author
+ * described what each product does and who it is for, not its stack, so their
+ * `stack` is empty too — the prose below is a rewrite of his description for
+ * clarity, not new information he didn't supply.
  *
  * Media dimensions are the intrinsic sizes of the source assets, so the layout
  * reserves the right box before anything loads (no CLS).
@@ -106,6 +113,44 @@ export const projects: Project[] = projectSchema.array().parse([
       ],
     },
     alt: 'Four screens of the OSC Compliance business-model-canvas platform',
+    stack: [],
+  },
+  {
+    id: 'colorinfinity',
+    category: 'Mobile',
+    title: 'Colorinfinity',
+    description:
+      'Colorinfinity is a mobile app for the clients and advisors behind buying and selling real-estate lots. It automates the process end to end on both sides, from the first quote to the last payment on a property, so an advisor can manage a sale and a client can follow it without leaving the app.',
+    media: { kind: 'video', basePath: '/media/projects/colorinfinity', width: 404, height: 848 },
+    alt: 'Screen recording of Colorinfinity: quoting and tracking a lot purchase as a client and as an advisor',
+    stack: [],
+  },
+  {
+    id: 'ditto-kids',
+    category: 'Mobile',
+    title: 'Ditto Kids',
+    description:
+      "Ditto Kids is a mobile app built for children's entertainment, with a large catalog of songs, podcasts and audio stories in multiple languages. It gives kids a space made for them to learn while they play, exploring music and stories on their own.",
+    media: { kind: 'video', basePath: '/media/projects/ditto-kids', width: 406, height: 850 },
+    alt: 'Screen recording of the Ditto Kids app: browsing songs, podcasts and stories for children',
+    stack: [],
+  },
+  {
+    id: 'ditto-kids-dashboard',
+    category: 'Web',
+    title: 'Ditto Kids Dashboard',
+    description:
+      "Ditto Kids Dashboard is the admin panel behind Ditto Kids, where administrators upload, edit and remove the app's catalog. It replaces a manual content process with a structured workflow, so new songs, podcasts and stories reach the app faster and with less effort.",
+    media: {
+      kind: 'carousel',
+      images: [
+        '/media/projects/ditto-dashboard-1.webp',
+        '/media/projects/ditto-dashboard-2.webp',
+        '/media/projects/ditto-dashboard-3.webp',
+        '/media/projects/ditto-dashboard-4.webp',
+      ],
+    },
+    alt: 'Four screens of the Ditto Kids Dashboard admin panel for managing app content',
     stack: [],
   },
 ] satisfies Project[]);

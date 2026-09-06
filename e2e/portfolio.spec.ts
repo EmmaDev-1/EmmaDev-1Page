@@ -50,8 +50,8 @@ test.describe('portfolio', () => {
     await expect(h1).toContainText("Hi, I'm Emmanuel a FrontEnd Engineer");
   });
 
-  test('renders all eight projects', async ({ page }) => {
-    await expect(page.locator('#projects article')).toHaveCount(8);
+  test('renders all eleven projects', async ({ page }) => {
+    await expect(page.locator('#projects article')).toHaveCount(11);
   });
 
   test('reveals content once it is scrolled into view', async ({ page }) => {
@@ -61,9 +61,10 @@ test.describe('portfolio', () => {
   });
 
   test('every project video defers its download', async ({ page }) => {
+    // 6 original video projects + Colorinfinity + Ditto Kids.
     const videos = page.locator('video');
     const count = await videos.count();
-    expect(count).toBe(6);
+    expect(count).toBe(8);
 
     for (let i = 0; i < count; i += 1) {
       await expect(videos.nth(i)).toHaveAttribute('preload', 'none');

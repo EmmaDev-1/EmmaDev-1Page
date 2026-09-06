@@ -14,7 +14,7 @@ const publicPath = (webPath: string) => path.join(PUBLIC, webPath.replace(/^\//,
  */
 describe('content invariants', () => {
   it('parses every schema at import time', () => {
-    expect(projects.length).toBe(8);
+    expect(projects.length).toBe(11);
     expect(experience.length).toBe(4);
     expect(profile.social.length).toBeGreaterThan(0);
   });
