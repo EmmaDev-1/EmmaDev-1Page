@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next';
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://emmadev.vercel.app';
+import { SITE_URL } from '@/lib/site';
 
 /** One page, so one entry — but a declared one, which the source site had not. */
 export default function sitemap(): MetadataRoute.Sitemap {

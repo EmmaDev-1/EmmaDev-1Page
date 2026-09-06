@@ -1,0 +1,16 @@
+# Nothing here is read by `next build`, and all of it would otherwise be
+# uploaded into the build context on every deploy.
+
+# The media masters — ~100 MB of source GIFs and MP4s that only
+# `pnpm media:build` ever touches. What the site actually serves is their
+# re-encoded output in public/media, which stays.
+assets/source
+
+# Tests and their artifacts.
+e2e
+playwright-report
+test-results
+
+# Design-system tooling: consumed by `pnpm lint:adherence` and `pnpm ds:sync`,
+# both of which run in CI, never during a deploy build.
+.design-system

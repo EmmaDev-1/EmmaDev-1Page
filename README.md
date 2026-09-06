@@ -194,6 +194,39 @@ one-line change in `src/content/` if wanted:
 
 ## Deployment
 
-The app is a fully static export target but is built for **Vercel**, because `next/image`
-optimisation needs a runtime optimiser. Set `NEXT_PUBLIC_SITE_URL` to the production origin so the
-canonical URL, sitemap and OG tags resolve correctly.
+Built for **Vercel** — every route prerenders, but `next/image` optimisation still wants a runtime
+optimiser.
+
+`vercel.json` pins the framework preset, install command and build command. That matters here
+because the Vercel project predates this rewrite: it was created when the repo was a static
+`index.html`, so its dashboard settings describe that site. `vercel.json` takes precedence over the
+dashboard, so the correct build is committed rather than remembered.
+
+`.vercelignore` keeps ~100 MB of media masters, the e2e suite and the design-system tooling out of
+the build context. None of it is read by `next build` — verified by building with those directories
+removed.
+
+### The site's origin
+
+Absolute URLs — canonical, Open Graph, sitemap, robots, JSON-LD — all come from `src/lib/site.ts`,
+which resolves in this order:
+
+1. **`NEXT_PUBLIC_SITE_URL`** — set this once a custom domain exists; it wins over everything.
+2. **`VERCEL_PROJECT_PRODUCTION_URL`** — injected by Vercel, stable across deployments. Preview
+   builds get the production domain, which is what a canonical URL should point at. Requires
+   "Automatically expose System Environment Variables" to stay enabled (it is, by default).
+3. **`http://localhost:3000`** — for `pnpm dev` and tests.
+
+There is deliberately no hardcoded production fallback. The previous one guessed
+`emmadev.vercel.app`; that domain is somebody else's portfolio, so with the env var absent every
+canonical URL and sitemap entry pointed at a stranger's site. A wrong constant is worse than none —
+it fails silently and looks right.
+
+### What still has to be done in the Vercel dashboard
+
+Not settable from the repo:
+
+- **Production branch.** Still `main`, which is the old static site. The rewrite lives on its
+  branches, so production will not change until one is merged. Pushing a branch does produce a
+  preview deployment — the fastest way to see this build on Vercel before touching production.
+- **Custom domain**, if one is wanted. Add it, then set `NEXT_PUBLIC_SITE_URL` to match.

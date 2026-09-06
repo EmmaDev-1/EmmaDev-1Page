@@ -3,6 +3,7 @@ import { JetBrains_Mono, Varela_Round } from 'next/font/google';
 import { MotionProvider } from '@/components/motion/MotionProvider';
 import { profile } from '@/content';
 import { BRAND_GRAPHITE } from '@/lib/brand';
+import { SITE_URL } from '@/lib/site';
 import '@/styles/globals.css';
 
 /**
@@ -25,7 +26,6 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://emmadev.vercel.app';
 const description =
   'Portfolio of Emmanuel, a frontend engineer building mobile apps with Flutter and Dart.';
 
