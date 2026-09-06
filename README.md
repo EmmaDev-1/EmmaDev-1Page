@@ -170,8 +170,13 @@ original eight projects' copy is still the author's wording from the old site, v
 **Colorinfinity, Ditto Kids and Ditto Kids Dashboard** are newer projects the author described in
 his own words — what each product does and who it is for, not a polished description. Their prose
 in `src/content/projects.ts` is a rewrite of that description for clarity, not new information he
-did not supply; he reviewed and can amend it at any time. None of the three names a specific
-technology, so — consistent with the rule below for the original eight — none carries a `stack`.
+did not supply; he reviewed and can amend it at any time. He supplied their stacks separately, so
+unlike most of the original eight all three carry chips.
+
+Two labels in those stacks are corrected rather than verbatim: `RevenueCat` and `Subscriptions`,
+given as "RevenewCat" and "suscriptions". That is not a departure from the rule below — the CV's
+quirks are the author's deliberate wording in a document he wrote, while these were typos in a chat
+message, and a misspelt tool name reads to anyone who knows the tool as not knowing it.
 
 These were left as found because they are the author's own words, not refactor targets. Each is a
 one-line change in `src/content/` if wanted:
@@ -180,8 +185,8 @@ one-line change in `src/content/` if wanted:
   `educacion`, `an simulation`, `ideal created`.
 - Technology labels keep their source casing on purpose, in both the projects and the CV's own
   skills list: `Postgre SQL`, `Boostrap`, `FireBase`, `Javascript`, `Key Managment`, `MicrosoftSQL`.
-- Eight of the eleven projects have no technology chips, because their descriptions name no
-  technologies and inventing a stack would be a fabrication.
+- Six of the eleven projects have no technology chips, because their descriptions name no
+  technologies and none were supplied — inventing a stack would be a fabrication.
 - The CV also lists Bineo (Banorte), Dyshez and Habitan-t, which the Projects section does not yet
   show. Adding them needs screenshots or recordings, the same as the three added here.
 - `profile.role` and the hero line both read `FrontEnd Engineer` — the author's chosen positioning.

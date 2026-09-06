@@ -17,8 +17,8 @@ import { projectSchema, type Project } from './schema';
  * technology; the rest are left empty rather than inferred, because guessing
  * someone's tech stack and printing it on their portfolio is a fabrication,
  * not a refactor. The same rule applies to the three newer entries: the author
- * described what each product does and who it is for, not its stack, so their
- * `stack` is empty too — the prose below is a rewrite of his description for
+ * described what each product does and who it is for, and supplied their
+ * stacks separately — the prose below is a rewrite of his description for
  * clarity, not new information he didn't supply.
  *
  * Media dimensions are the intrinsic sizes of the source assets, so the layout
@@ -33,7 +33,7 @@ export const projects: Project[] = projectSchema.array().parse([
       'Colorinfinity is a mobile app for the clients and advisors behind buying and selling real-estate lots. It automates the process end to end on both sides, from the first quote to the last payment on a property, so an advisor can manage a sale and a client can follow it without leaving the app.',
     media: { kind: 'video', basePath: '/media/projects/colorinfinity', width: 404, height: 848 },
     alt: 'Screen recording of Colorinfinity: quoting and tracking a lot purchase as a client and as an advisor',
-    stack: [],
+    stack: ['Flutter', 'Stripe', 'Riverpod', 'Sentry', 'CI-CD'],
   },
   {
     id: 'ditto-kids',
@@ -43,7 +43,14 @@ export const projects: Project[] = projectSchema.array().parse([
       "Ditto Kids is a mobile app built for children's entertainment, with a large catalog of songs, podcasts and audio stories in multiple languages. It gives kids a space made for them to learn while they play, exploring music and stories on their own.",
     media: { kind: 'video', basePath: '/media/projects/ditto-kids', width: 406, height: 850 },
     alt: 'Screen recording of the Ditto Kids app: browsing songs, podcasts and stories for children',
-    stack: [],
+    /*
+     * Supplied as "RevenewCat" and "suscriptions". Corrected to the product's
+     * real name and the English spelling: unlike the CV's own quirks, which are
+     * the author's deliberate wording and are preserved verbatim elsewhere in
+     * this file, these were typos in a chat message. A misspelt tool name reads
+     * to anyone who knows RevenueCat as not knowing it.
+     */
+    stack: ['Flutter', 'Riverpod', 'RevenueCat', 'Subscriptions', 'Sentry'],
   },
   {
     id: 'ditto-kids-dashboard',
@@ -61,7 +68,9 @@ export const projects: Project[] = projectSchema.array().parse([
       ],
     },
     alt: 'Four screens of the Ditto Kids Dashboard admin panel for managing app content',
-    stack: [],
+    // "NextJs" as given; written NextJS to match the label used in the CV's
+    // skills list, the About toolkit and the Pai role.
+    stack: ['NextJS'],
   },
   {
     id: 'pay',
