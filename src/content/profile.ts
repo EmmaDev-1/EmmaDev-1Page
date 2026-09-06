@@ -88,6 +88,7 @@ export const profile: Profile = profileSchema.parse({
       height: 1553,
     },
   },
+  email: 'emmanueldev3a@gmail.com',
   social: [
     {
       network: 'linkedin',

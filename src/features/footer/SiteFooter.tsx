@@ -20,6 +20,7 @@ import { profile } from '@/content';
 export function SiteFooter() {
   const year = new Date().getFullYear();
   const linkedin = profile.social.find((link) => link.network === 'linkedin');
+  const [emailLocalPart, emailDomain] = profile.email.split('@');
 
   return (
     <footer className="relative overflow-hidden border-t border-hairline px-5 py-24 nav:px-12">
@@ -35,14 +36,42 @@ export function SiteFooter() {
             <LineReveal lines={['Have a project', 'in mind?']} />
           </h2>
 
+          {/*
+            The address itself is the link text rather than a "Email me" label.
+            A reader who wants to write from their own client needs to be able
+            to read and copy it, not just trigger a mailto: their machine may
+            have nothing registered to handle.
+          */}
+          {/*
+            Sized down on phones: at display-2 a 23-character address is wider
+            than a 390px viewport and gets clipped mid-domain. `anywhere` is the
+            belt-and-braces — it lets the address wrap rather than overflow at
+            any width, however narrow — but the <wbr> after the "@" is what it
+            normally breaks on, so on a 320px screen the address splits at its
+            own seam instead of stranding a single letter on the second line.
+            <wbr> contributes no text, so the accessible name and anything
+            copied off the page are still the whole address.
+
+            skip-ink off because at this size the underline otherwise breaks
+            around the descenders in "@" and "g", which reads as a rendering
+            fault rather than as one continuous rule.
+          */}
+          <a
+            href={`mailto:${profile.email}`}
+            className="text-heading-2 leading-tight tracking-display text-heading underline decoration-strong underline-offset-[0.15em] [overflow-wrap:anywhere] [text-decoration-skip-ink:none] transition-colors duration-normal ease-standard nav:text-display-2 hover:decoration-accent hover:text-ink-000"
+          >
+            {emailLocalPart}@<wbr />
+            {emailDomain}
+          </a>
+
           {linkedin ? (
             <a
               href={linkedin.href}
               target="_blank"
               rel="noreferrer"
-              className="text-body-lg text-ink-100 underline decoration-strong underline-offset-8 transition-colors duration-normal ease-standard hover:decoration-accent hover:text-ink-000"
+              className="text-body-lg text-ink-300 underline decoration-strong underline-offset-8 transition-colors duration-normal ease-standard hover:decoration-accent hover:text-ink-000"
             >
-              Reach me on LinkedIn
+              or reach me on LinkedIn
             </a>
           ) : null}
         </Reveal>

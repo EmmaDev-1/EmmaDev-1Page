@@ -192,8 +192,10 @@ one-line change in `src/content/` if wanted:
 - `profile.role` and the hero line both read `FrontEnd Engineer` — the author's chosen positioning.
   It is deliberately neither the degree (`Software Engineering`, on `profile.education`) nor the CV's
   per-role job title (`Flutter Developer`, on each Experience entry).
-- The CV's contact details (email, phone) are deliberately **not** rendered into the page HTML. They
-  are in the downloadable PDF, but putting them in markup invites scrapers.
+- The author's **email is published** in the footer and in the JSON-LD, at his request. It was
+  previously kept out of the markup to avoid scrapers, but that was buying very little: the CV the
+  site serves for download prints the same address, so it was already public. His **phone number
+  stays out** — it is only in the PDF, and nothing on the page needs it.
 
 ---
 

@@ -18,6 +18,7 @@ export function PersonJsonLd() {
     name: profile.name,
     jobTitle: profile.role,
     description: profile.aboutBody,
+    email: profile.email,
     sameAs: profile.social.map((link) => link.href),
     worksFor: experience.map((role) => ({ '@type': 'Organization', name: role.org })),
     alumniOf: {

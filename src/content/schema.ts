@@ -115,6 +115,13 @@ export const profileSchema = z.object({
     pdf: nonEmpty,
     preview: imageMediaSchema,
   }),
+  /**
+   * Published deliberately, at the author's request. It already reached the
+   * page anyway — it is printed inside the CV the site serves for download —
+   * so keeping it out of the markup was buying very little while costing the
+   * most direct way to reach him.
+   */
+  email: z.email(),
   social: z.array(socialLinkSchema).min(1),
 });
 

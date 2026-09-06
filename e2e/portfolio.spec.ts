@@ -77,6 +77,14 @@ test.describe('portfolio', () => {
     await expect(link).toHaveAttribute('href', '/docs/Emmanuel_Aguilar_CV.pdf');
   });
 
+  test('offers the email as a real mailto link', async ({ page }) => {
+    // The address is the link text on purpose: a reader with no mail client
+    // registered still needs to be able to read and copy it.
+    const email = page.getByRole('link', { name: 'emmanueldev3a@gmail.com' });
+    await email.scrollIntoViewIfNeeded();
+    await expect(email).toHaveAttribute('href', 'mailto:emmanueldev3a@gmail.com');
+  });
+
   test('publishes structured data describing the author', async ({ page }) => {
     const raw = await page.locator('script[type="application/ld+json"]').textContent();
     const data = JSON.parse(raw ?? '{}');
