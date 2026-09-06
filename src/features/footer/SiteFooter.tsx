@@ -55,10 +55,15 @@ export function SiteFooter() {
             skip-ink off because at this size the underline otherwise breaks
             around the descenders in "@" and "g", which reads as a rendering
             fault rather than as one continuous rule.
+
+            Both sizes are the heading-2 / display-2 tokens scaled to 80% via
+            calc(), at the author's request for a smaller footer email — not a
+            new hardcoded size, so it still tracks the token if the scale ever
+            changes upstream.
           */}
           <a
             href={`mailto:${profile.email}`}
-            className="text-heading-2 leading-tight tracking-display text-heading underline decoration-strong underline-offset-[0.15em] [overflow-wrap:anywhere] [text-decoration-skip-ink:none] transition-colors duration-normal ease-standard nav:text-display-2 hover:decoration-accent hover:text-ink-000"
+            className="text-[calc(var(--text-heading-2)*0.8)] leading-tight tracking-display text-heading underline decoration-strong underline-offset-[0.15em] [overflow-wrap:anywhere] [text-decoration-skip-ink:none] transition-colors duration-normal ease-standard nav:text-[calc(var(--text-display-2)*0.8)] hover:decoration-accent hover:text-ink-000"
           >
             {emailLocalPart}@<wbr />
             {emailDomain}
