@@ -28,6 +28,7 @@ const run = promisify(execFile);
 const ROOT = path.resolve(import.meta.dirname, '..');
 const SRC = path.join(ROOT, 'assets', 'source');
 const PUBLIC = path.join(ROOT, 'public');
+const APP_DIR = path.join(ROOT, 'src', 'app');
 
 /** Tallest we ever render a phone recording, at 2x. Anything above is waste. */
 const MAX_VIDEO_HEIGHT = 1080;
@@ -222,6 +223,40 @@ async function encodeVideo(job: VideoJob): Promise<{ before: number; after: numb
   return { before, after };
 }
 
+/**
+ * The browser tab icon.
+ *
+ * Same master as the About Me portrait, cropped much tighter around the head.
+ * The portrait's own crop (`fit: cover, position: top`) is right for a
+ * section photo — it keeps the shoulders and reads as a portrait — but a
+ * favicon is seen at 16-48px, where that framing spends half the square on
+ * white background and leaves the face too small to read. This crop keeps
+ * only the head and collar, chosen by rendering it at real favicon sizes and
+ * checking it stayed legible down to 16x16.
+ *
+ * Lands in src/app/, not public/: that is Next.js's file convention for the
+ * tab icon (the App Router auto-serves any icon.(png|svg|ico) placed at the
+ * app root), and the one output this pipeline places outside public/.
+ */
+async function encodeFavicon(): Promise<{ before: number; after: number }> {
+  const from = 'aboutMe/EmmaDevAnimated2.jpeg';
+  const input = path.join(SRC, from);
+  const output = path.join(APP_DIR, 'icon.png');
+
+  await sharp(input)
+    .extract({ left: 20, top: 0, width: 560, height: 560 })
+    .resize(256, 256)
+    .png({ compressionLevel: 9, palette: true })
+    .toFile(output);
+
+  const before = await sizeOf(input);
+  const after = await sizeOf(output);
+  console.log(
+    `  ${from.padEnd(30)} ${kb(before).padStart(10)} -> ${kb(after).padStart(9)}  (favicon crop)`,
+  );
+  return { before, after };
+}
+
 async function encodeImage(job: ImageJob): Promise<{ before: number; after: number }> {
   const input = path.join(SRC, job.from);
   const output = path.join(PUBLIC, job.to);
@@ -266,6 +301,13 @@ async function main(): Promise<void> {
   console.log('\nRe-encoding stills (-> WebP)');
   for (const job of imageJobs) {
     const r = await encodeImage(job);
+    before += r.before;
+    after += r.after;
+  }
+
+  console.log('\nGenerating the favicon');
+  {
+    const r = await encodeFavicon();
     before += r.before;
     after += r.after;
   }

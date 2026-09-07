@@ -150,6 +150,12 @@ loaded eagerly. `pnpm media:build` re-encodes them:
 Three later projects — Colorinfinity, Ditto Kids and Ditto Kids Dashboard — added two MP4 sources
 and four screenshots, bringing the current total to **~15 MB** across all eleven projects.
 
+**The browser tab icon** is generated from the same About Me photo (`aboutMe/EmmaDevAnimated2.jpeg`)
+as the portrait, but cropped much tighter around the head — a favicon is read at 16–48px, where the
+portrait's own framing is mostly white background. It lands at `src/app/icon.png` rather than
+`public/`, which is Next's file convention for the tab icon: the App Router serves any
+`icon.(png|svg|ico)` placed at the app root automatically, no metadata wiring needed.
+
 **MP4 sources need one more step than a GIF does.** `sharp` decodes GIF frames directly but cannot
 open a video container at all, so the pipeline extracts frame 0 through `ffmpeg` first and reads
 _that_ — an ordinary PNG — for both the source dimensions and the poster image. This generalises
