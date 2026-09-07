@@ -237,11 +237,14 @@ There is deliberately no hardcoded production fallback. The previous one guessed
 canonical URL and sitemap entry pointed at a stranger's site. A wrong constant is worse than none —
 it fails silently and looks right.
 
+This build is live. `main` fast-forwarded onto the rewrite and Vercel's GitHub integration
+deployed it — production serves the Next.js site, not the old `index.html`. Verified against
+`emma-dev.vercel.app`: all five routes return 200, and the canonical URL, sitemap and OG image all
+resolve to that host through `VERCEL_PROJECT_PRODUCTION_URL`, with no `NEXT_PUBLIC_SITE_URL` set.
+
 ### What still has to be done in the Vercel dashboard
 
 Not settable from the repo:
 
-- **Production branch.** Still `main`, which is the old static site. The rewrite lives on its
-  branches, so production will not change until one is merged. Pushing a branch does produce a
-  preview deployment — the fastest way to see this build on Vercel before touching production.
-- **Custom domain**, if one is wanted. Add it, then set `NEXT_PUBLIC_SITE_URL` to match.
+- **Custom domain**, if one is wanted. Add it, then set `NEXT_PUBLIC_SITE_URL` to match — until
+  then every absolute URL correctly points at the `.vercel.app` host.
