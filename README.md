@@ -67,6 +67,39 @@ transparent over the hero and glass past it), `SectionRail` (where you are, wide
 screens only) and `ScrollProgress`. Below 768px all three give way to a
 full-screen `MobileMenu`.
 
+**The links are plain `<a href="#id">`, deliberately.** A fragment navigation sets the
+[sequential focus navigation starting point](https://www.matuzo.at/blog/2026/skip-links-tabindex),
+so a keyboard reader carries on from the section rather than the top of the page. The
+common `preventDefault` + `scrollIntoView` alternative — usually adopted to keep the
+address bar clean — has to rebuild that by hand, and Chrome and Firefox disagree on
+whether `scrollIntoView` focuses its target at all. It also costs deep linking, which is
+the thing a portfolio most wants to keep. `next/link` is not used for same-page fragments
+either; it adds routing machinery to something the browser already does better.
+
+**`useHashSync` keeps the address bar honest between clicks.** The scroll spy already
+knows which section is on screen for the active nav pill; the same answer is written to
+the URL with `replaceState`, so an address copied at any point links to what the reader
+was looking at, and the fragment clears again at the top of the page. `replaceState`
+rather than assigning `location.hash`, which is itself a navigation: that would push a
+history entry per section crossed and re-scroll to a section already on screen. Reading
+is not navigating, so `back` still leaves the site.
+
+**Smooth scrolling is switched on from script, not declared in CSS.** `scroll-behavior:
+smooth` also governs the scroll the browser performs on arriving at a URL carrying a
+fragment — and that one runs while the page is still parsing, hydrating and decoding
+media. Starved of main thread it stops partway, parking a shared `/#experience` link on
+Projects: measured at 5 of 8 parallel cold loads. The stylesheet therefore starts
+`auto` and `useSmoothScroll` sets `data-scroll-smooth` after hydration, by which point
+the arrival has already happened as an instant jump. Smooth is then left to what it is
+for — moving between sections once you are reading. Both halves are asserted in `e2e/`:
+that a cold deep link lands flush, and that a nav click still travels rather than cuts.
+
+**Sections land flush with the top of the viewport.** No nav clearance is added: each
+section carries 160px of its own top padding on desktop against a 77px bar, so the bar
+only ever overlaps empty padding. The offset is declared once, as `scroll-padding-top` on
+`<html>` — a `scroll-mt-*` on a section would stack on top of it rather than replace it,
+since the spec sums the container's scroll-padding with the target's scroll-margin.
+
 ### What this costs
 
 Every section is now a Client Component. Scroll-linked animation needs the element's own

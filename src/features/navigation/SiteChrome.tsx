@@ -9,6 +9,7 @@ import {
   useNavVisibility,
   usePrecisePointer,
   useScrollSpy,
+  useSmoothScroll,
 } from '@/lib/hooks';
 import { MobileMenu } from './MobileMenu';
 import { ScrollProgress } from './ScrollProgress';
@@ -44,6 +45,13 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     nav click.
   */
   useHashSync(activeId, SECTION_IDS.home);
+
+  /*
+    Smoothness is switched on here rather than declared in CSS, so that a cold
+    arrival at a shared link lands instantly instead of animating on a page
+    that is too busy to animate it. See globals.css.
+  */
+  useSmoothScroll();
 
   const navVisible = useNavVisibility();
   const precisePointer = usePrecisePointer();

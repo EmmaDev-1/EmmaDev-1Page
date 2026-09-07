@@ -173,7 +173,24 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /*
+      Deliberately not `smooth`. A stylesheet cannot tell the two kinds of
+      scroll apart, and only one of them wants an animation.
+
+      `scroll-behavior: smooth` also governs the scroll a browser performs on
+      arriving at a URL that carries a fragment — and that one runs while the
+      page is still parsing, hydrating and decoding media. On a busy main
+      thread the animation is starved and simply stops partway, parking a
+      shared /#experience link on Projects. Measured over eight parallel cold
+      loads: 5 stopped short with smooth declared here, 0 without it.
+
+      So the page starts instant and `useSmoothScroll` switches smoothness on
+      after hydration, by which point the arrival has already happened. That
+      leaves smooth for what it is actually for — moving between sections once
+      you are reading — and an arrival is not that: someone who opened a link
+      to one section did not ask to be shown the page on the way.
+    */
+    scroll-behavior: auto;
     /*
       Sections land flush with the top of the viewport, by request.
 
@@ -190,6 +207,17 @@
       the target's scroll-margin are summed.
     */
     scroll-padding-top: 0;
+  }
+
+  /*
+    Set by useSmoothScroll after hydration. The attribute name is repeated in
+    lib/hooks.ts and the two must stay in step.
+
+    Reduced motion still wins: the `!important` on the universal selector below
+    applies to <html> too, and beats this regardless of specificity.
+  */
+  html[data-scroll-smooth] {
+    scroll-behavior: smooth;
   }
 
   body {

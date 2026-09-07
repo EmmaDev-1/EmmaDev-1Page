@@ -46,6 +46,30 @@ export function useScrollSpy(ids: readonly string[], fallback: string): string {
   return active;
 }
 
+/** Must stay in step with the `html[data-scroll-smooth]` rule in globals.css. */
+const SMOOTH_SCROLL_ATTR = 'data-scroll-smooth';
+
+/**
+ * Switches page-level smooth scrolling on, once, after hydration.
+ *
+ * It is off in the stylesheet on purpose, and the reasoning lives there: CSS
+ * cannot distinguish the scroll a reader asks for from the one the browser
+ * performs on arriving at a URL carrying a fragment, and animating the second
+ * makes it fail — starved by a loading page, it stops partway and leaves a
+ * shared link parked on the wrong section.
+ *
+ * Hydration is late enough to be safe. With the stylesheet starting instant,
+ * the arrival scroll is a jump the browser has already made by the time React
+ * runs, so there is nothing in flight for this to turn smooth mid-travel.
+ */
+export function useSmoothScroll(): void {
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute(SMOOTH_SCROLL_ATTR, '');
+    return () => root.removeAttribute(SMOOTH_SCROLL_ATTR);
+  }, []);
+}
+
 /**
  * How long to wait for a fragment scroll to finish when the browser will not
  * tell us. `scrollend` is the real signal; this is only the escape hatch for

@@ -178,6 +178,36 @@ test.describe('desktop navigation', () => {
         expect(Math.abs(top)).toBeLessThan(4);
       });
     }
+
+    test('travels between sections rather than cutting to them', async ({ page }) => {
+      /*
+       * Smoothness is no longer declared in the stylesheet — it is switched on
+       * after hydration so that a cold arrival at a shared link lands
+       * instantly. That makes it something script can now fail to do, so the
+       * animation is asserted rather than assumed.
+       *
+       * Counted in scroll positions rather than timed: a jump passes through
+       * two, an animation through many.
+       */
+      await page.goto('/');
+      await page.waitForTimeout(1000);
+
+      const sampling = page.evaluate(() => {
+        const seen = new Set<number>();
+        const until = performance.now() + 2000;
+        return new Promise<number>((resolve) => {
+          const tick = () => {
+            seen.add(Math.round(window.scrollY));
+            if (performance.now() < until) requestAnimationFrame(tick);
+            else resolve(seen.size);
+          };
+          requestAnimationFrame(tick);
+        });
+      });
+
+      await page.click('header a[href="#curriculum"]');
+      expect(await sampling).toBeGreaterThan(5);
+    });
   });
 
   test.describe('hide on scroll', () => {
@@ -276,12 +306,8 @@ test.describe('the URL follows the reader', () => {
      *     with nothing suspending it the address stepped through #about and
      *     #projects on the way down.
      *
-     * What the fragment settles on is not asserted. The browser's smooth
-     * scroll to a fragment on a cold load is routinely starved and stops
-     * short — 5 of 8 parallel cold loads, measured with this hook removed
-     * entirely — and when it does, the address naming the section the reader
-     * actually ended on is the sync working, not failing. Landing accuracy on
-     * a warm page is covered exactly by the jump-link tests above.
+     * The fragment must therefore be #experience at every sample, never blank
+     * and never a section merely passed over.
      */
     await page.goto('/#experience');
 
@@ -291,8 +317,21 @@ test.describe('the URL follows the reader', () => {
       seen.add(new URL(page.url()).hash);
     }
 
-    expect([...seen]).not.toContain('');
-    expect([...seen]).not.toContain('#about');
+    expect([...seen]).toEqual(['#experience']);
+  });
+
+  test('puts a shared deep link on its section, cold load and all', async ({ page }) => {
+    /*
+     * The arrival is a jump rather than an animation, which is what makes this
+     * assertable at all. `scroll-behavior: smooth` governs the browser's own
+     * scroll to a fragment, and that one runs while the page is still parsing
+     * and decoding media — starved of main thread, it stops partway and parks
+     * the reader on the wrong section. Measured over eight parallel cold
+     * loads: 5 of 8 stopped short with smooth declared in the stylesheet, 0 of
+     * 8 once it was switched on after hydration instead.
+     */
+    await page.goto('/#experience');
+    await landed(page, 'experience');
   });
 });
 
