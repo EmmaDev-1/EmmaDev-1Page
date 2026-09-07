@@ -3,7 +3,13 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { CursorTrail, NavToggle } from '@/components/design-system';
 import { SECTION_IDS } from '@/content';
-import { useBodyScrollLock, useNavVisibility, usePrecisePointer, useScrollSpy } from '@/lib/hooks';
+import {
+  useBodyScrollLock,
+  useHashSync,
+  useNavVisibility,
+  usePrecisePointer,
+  useScrollSpy,
+} from '@/lib/hooks';
 import { MobileMenu } from './MobileMenu';
 import { ScrollProgress } from './ScrollProgress';
 import { SectionRail } from './SectionRail';
@@ -31,6 +37,13 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const sectionIds = useMemo(() => Object.values(SECTION_IDS), []);
   const activeId = useScrollSpy(sectionIds, SECTION_IDS.home);
   const activeHref = `#${activeId}`;
+
+  /*
+    The spy already knows where the reader is; this puts it in the address bar
+    too, so the URL is worth copying at any point and not only right after a
+    nav click.
+  */
+  useHashSync(activeId, SECTION_IDS.home);
 
   const navVisible = useNavVisibility();
   const precisePointer = usePrecisePointer();

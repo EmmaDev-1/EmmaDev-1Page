@@ -4,6 +4,22 @@ import { expect, test, type Page } from '@playwright/test';
 const CURSOR_TRAIL_DOTS = 'body > div[aria-hidden="true"] > span';
 
 /**
+ * Waits for the section `id` to come to rest flush with the top of the
+ * viewport — that is, for a fragment scroll to have actually finished rather
+ * than merely been started.
+ */
+async function landed(page: Page, id: string): Promise<void> {
+  await page.waitForFunction(
+    (target) => {
+      const el = document.getElementById(target);
+      return el !== null && Math.abs(el.getBoundingClientRect().top) < 4;
+    },
+    id,
+    { timeout: 10_000 },
+  );
+}
+
+/**
  * Scrolls until the chrome element reaches `expected`, nudging repeatedly.
  *
  * A single wheel plus a fixed wait is not reliable here. The very first wheel
@@ -141,22 +157,25 @@ test.describe('desktop navigation', () => {
 
   test.describe('jump-link landing', () => {
     /**
-     * `scroll-padding-top` on <html> and `scroll-margin-top` on the target both
-     * contribute to a fragment-navigation landing spot, per the CSS Scroll
-     * Snap spec — declaring the same nav-clearance offset in both places
-     * doubled it, landing every section 80px further down than intended.
+     * Sections land flush with the top of the viewport.
+     *
+     * The offset is declared in exactly one place, `scroll-padding-top` on
+     * <html>. It is asserted here because the two ways of setting it stack
+     * rather than override: per the CSS Scroll Snap spec the container's
+     * scroll-padding and the target's scroll-margin are summed, so a
+     * `scroll-mt-*` added to a section later would silently push every
+     * landing down again — which is exactly how this broke once before.
      */
     for (const href of ['#about', '#projects', '#experience', '#curriculum']) {
-      test(`lands ${href} just under the nav, not floating further down`, async ({ page }) => {
+      test(`lands ${href} flush with the top of the viewport`, async ({ page }) => {
         await page.goto('/');
         await page.click(`header a[href="${href}"]`);
         await page.waitForTimeout(1500);
 
         const top = await page.locator(href).evaluate((el) => el.getBoundingClientRect().top);
 
-        // One offset, not two: within a few px of --space-20 (80px), not ~160px.
-        expect(top).toBeGreaterThan(60);
-        expect(top).toBeLessThan(100);
+        // Zero, not one offset and not two.
+        expect(Math.abs(top)).toBeLessThan(4);
       });
     }
   });
@@ -205,6 +224,75 @@ test.describe('desktop navigation', () => {
       const box = await page.getByTestId('navbar').boundingBox();
       expect(box!.y).toBeGreaterThanOrEqual(0);
     });
+  });
+});
+
+test.describe('the URL follows the reader', () => {
+  test('writes the section being read without a click', async ({ page }) => {
+    await page.goto('/');
+    // Arrives with no fragment, and scrolling alone is enough to earn one.
+    expect(new URL(page.url()).hash).toBe('');
+
+    await page.getByRole('heading', { name: 'Projects' }).scrollIntoViewIfNeeded();
+    await expect.poll(() => new URL(page.url()).hash, { timeout: 5000 }).toBe('#projects');
+  });
+
+  test('drops the fragment again at the top of the page', async ({ page }) => {
+    await page.goto('/#projects');
+    await expect.poll(() => new URL(page.url()).hash, { timeout: 5000 }).toBe('#projects');
+
+    // Let the arrival land before starting a second scroll. `scroll-behavior:
+    // smooth` applies to the fragment scroll on load too, and a scrollTo issued
+    // while that is still travelling loses to it — the page ends up back at
+    // #projects and the assertion below fails for a reason that has nothing to
+    // do with what this test is about.
+    await landed(page, 'projects');
+
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await expect.poll(() => new URL(page.url()).hash, { timeout: 5000 }).toBe('');
+  });
+
+  test('never pushes a history entry for scrolling', async ({ page }) => {
+    await page.goto('/');
+    const before = await page.evaluate(() => history.length);
+
+    await page.getByRole('heading', { name: 'Experience' }).scrollIntoViewIfNeeded();
+    await expect.poll(() => new URL(page.url()).hash, { timeout: 5000 }).toBe('#experience');
+
+    // replaceState, not a hash assignment: reading the page is not navigation,
+    // so `back` must still leave the site rather than retrace the scroll.
+    expect(await page.evaluate(() => history.length)).toBe(before);
+  });
+
+  test('neither blanks nor walks a shared deep link on arrival', async ({ page }) => {
+    /*
+     * Two ways the sync could damage an incoming fragment, both measured
+     * happening before they were suppressed:
+     *
+     *   - Blanking it. The spy mounts holding its "home" fallback, so writing
+     *     on that first pass rewrites a shared /#experience to `/` before the
+     *     browser has travelled anywhere.
+     *   - Walking it. A load fires no `hashchange` to announce its scroll, so
+     *     with nothing suspending it the address stepped through #about and
+     *     #projects on the way down.
+     *
+     * What the fragment settles on is not asserted. The browser's smooth
+     * scroll to a fragment on a cold load is routinely starved and stops
+     * short — 5 of 8 parallel cold loads, measured with this hook removed
+     * entirely — and when it does, the address naming the section the reader
+     * actually ended on is the sync working, not failing. Landing accuracy on
+     * a warm page is covered exactly by the jump-link tests above.
+     */
+    await page.goto('/#experience');
+
+    const seen = new Set<string>();
+    for (let i = 0; i < 12; i += 1) {
+      await page.waitForTimeout(250);
+      seen.add(new URL(page.url()).hash);
+    }
+
+    expect([...seen]).not.toContain('');
+    expect([...seen]).not.toContain('#about');
   });
 });
 

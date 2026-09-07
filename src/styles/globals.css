@@ -174,8 +174,22 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* The sticky nav must not cover the section a hash link lands on. */
-    scroll-padding-top: var(--space-20);
+    /*
+      Sections land flush with the top of the viewport, by request.
+
+      No nav clearance is added here, and none is needed: every section carries
+      160px of its own top padding on desktop (80px on phones), while the bar
+      is 77px tall and the phone toggle bottoms out at 64px. The bar therefore
+      only ever overlaps a section's empty padding — its first heading sits
+      232px in — so an offset on top of that bought nothing but dead space
+      above every landing.
+
+      Note this is the only place the landing offset is declared. Adding
+      `scroll-mt-*` to a section would not replace this value but stack on top
+      of it: per the CSS Scroll Snap spec the container's scroll-padding and
+      the target's scroll-margin are summed.
+    */
+    scroll-padding-top: 0;
   }
 
   body {

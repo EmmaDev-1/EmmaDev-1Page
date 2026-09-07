@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PRECISE_POINTER_QUERY, SCROLL_SPY_ROOT_MARGIN } from './brand';
 
 /**
@@ -44,6 +44,107 @@ export function useScrollSpy(ids: readonly string[], fallback: string): string {
   }, [ids]);
 
   return active;
+}
+
+/**
+ * How long to wait for a fragment scroll to finish when the browser will not
+ * tell us. `scrollend` is the real signal; this is only the escape hatch for
+ * engines that do not fire it, so that one navigation can never leave the
+ * address bar frozen for the rest of the session.
+ *
+ * It can afford to be generous, which is why it is not tuned to the length of
+ * a scroll: throughout the wait the address bar holds the fragment the reader
+ * just navigated to, so it is already correct — this only decides how soon
+ * free scrolling starts updating it again.
+ */
+const SCROLL_SETTLE_FALLBACK_MS = 3000;
+
+/**
+ * Mirrors the section being read into the address bar.
+ *
+ * A nav click already writes a fragment. This is what makes the URL true the
+ * rest of the time: someone who scrolled to the work and copied the address
+ * gets a link to the work, not to the top of the page.
+ *
+ * `history.replaceState` rather than assigning `location.hash` — assigning is
+ * itself a fragment navigation, so it would both push a history entry for
+ * every section crossed and send the browser scrolling to a section the reader
+ * is already looking at, fighting the scroll that triggered it.
+ *
+ * Two moments are deliberately left alone:
+ *
+ *   - The first pass. Whatever URL the reader arrived on wins until they
+ *     actually move, so landing on a shared `/#projects` link is not rewritten
+ *     to `/` by the spy's initial fallback before the browser has scrolled
+ *     there at all.
+ *   - Anything in flight. A fragment navigation fires `hashchange` at the
+ *     start of its smooth scroll, not the end, so a click on the last nav item
+ *     would otherwise walk the address bar through every section on the way
+ *     down. Writing is suspended from that event until the scroll settles, and
+ *     resumes with one write so a reader who grabs the scrollbar mid-flight
+ *     still ends up with an honest URL.
+ */
+export function useHashSync(activeId: string, rootId: string): void {
+  const latest = useRef(activeId);
+  const settled = useRef(true);
+  const ready = useRef(false);
+
+  const write = useCallback(() => {
+    if (!ready.current || !settled.current) return;
+
+    const { pathname, search, hash } = window.location;
+    const id = latest.current;
+    // The top of the page is the page: `/` is the address to share for the
+    // site as a whole, and what a reader who scrolls back up expects to see.
+    const next = id === rootId ? `${pathname}${search}` : `${pathname}${search}#${id}`;
+
+    if (`${pathname}${search}${hash}` !== next) {
+      window.history.replaceState(null, '', next);
+    }
+  }, [rootId]);
+
+  useEffect(() => {
+    let timer = 0;
+
+    const resume = () => {
+      window.clearTimeout(timer);
+      settled.current = true;
+      write();
+    };
+
+    const suspend = () => {
+      settled.current = false;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(resume, SCROLL_SETTLE_FALLBACK_MS);
+    };
+
+    /*
+      A load carrying a fragment scrolls just like a click does, but announces
+      it with no event at all — `hashchange` fires for navigation within a
+      document, and this is a fresh one. Starting suspended is what covers it;
+      without this, arriving on a shared link walked the address bar through
+      every section on the way down (#about, #projects, then finally
+      #experience) before settling.
+    */
+    if (window.location.hash) suspend();
+
+    window.addEventListener('hashchange', suspend);
+    window.addEventListener('scrollend', resume);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('hashchange', suspend);
+      window.removeEventListener('scrollend', resume);
+    };
+  }, [write]);
+
+  useEffect(() => {
+    latest.current = activeId;
+    if (!ready.current) {
+      ready.current = true;
+      return;
+    }
+    write();
+  }, [activeId, write]);
 }
 
 type NavVisibilityOptions = {
