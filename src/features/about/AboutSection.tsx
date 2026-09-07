@@ -47,11 +47,25 @@ export function AboutSection() {
         </Reveal>
 
         <Stagger className="flex flex-col gap-8" delay={0.1}>
-          <StaggerItem
-            as="p"
-            className="m-0 max-w-[var(--measure-prose)] text-body-lg leading-relaxed text-ink-100 text-pretty"
-          >
-            {profile.aboutBody}
+          {profile.aboutBody.map((paragraph) => (
+            <StaggerItem
+              key={paragraph}
+              as="p"
+              className="m-0 max-w-[var(--measure-prose)] text-body-lg leading-relaxed text-ink-100 text-pretty"
+            >
+              {paragraph}
+            </StaggerItem>
+          ))}
+
+          <StaggerItem>
+            <blockquote className="m-0 max-w-[var(--measure-prose)] border-l-2 border-accent py-1 pl-6">
+              <p className="m-0 text-body-lg leading-relaxed text-ink-100 text-pretty">
+                “{profile.aboutQuote.text}”
+              </p>
+              <cite className="mt-3 block font-mono text-micro tracking-wide text-ink-300 uppercase not-italic">
+                — {profile.aboutQuote.author}
+              </cite>
+            </blockquote>
           </StaggerItem>
 
           <StaggerItem>

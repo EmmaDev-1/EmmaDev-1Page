@@ -31,22 +31,24 @@ export const profile: Profile = profileSchema.parse({
   headlineLines,
   // Joined, never retyped: the page title, the OG card and the <h1> can't drift.
   headline: headlineLines.join(' '),
-  /*
-   * The design system's hero specifies a line under the headline, and picks
-   * this sentence for it. It is also the closing line of aboutBody — the echo
-   * is deliberate and upstream's own choice: it works as a hook at the top and
-   * as a resolution further down.
-   */
+  /** The design system's hero specifies a line under the headline. */
   tagline: 'My dream is to create digital art through my code and designs.',
   aboutHeading: 'Hi, nice to meet you',
-  /*
-   * One clause changed from the source: "As a software engineer with
-   * experience" became the concrete thing the CV shows he actually does now.
-   * The rest of the paragraph is his own wording, untouched — the CV carries no
-   * bio of its own, so there was nothing else to update from.
+  /**
+   * The author's second rewrite of his own bio — supplied directly, verbatim,
+   * as two paragraphs. It no longer closes on the tagline sentence the way the
+   * previous version did; that echo was this file's own past choice, not a
+   * design-system requirement, so dropping it here is not a regression.
    */
-  aboutBody:
-    "I've always loved to design and create things since I was in high school. Today I build mobile apps with Flutter, and I now know that my inspiration is in developing unique products in the market. I'm confident, creative and naturally determined to keep improving my skills. My dream is to create digital art through my code and designs.",
+  aboutBody: [
+    "Hello, I'm Emmanuel Aguilar, a Software Engineer focused on mobile development with Flutter. I've had the opportunity to work on a wide variety of projects, from management to delivery and banking applications.",
+    "My main goal is to create applications with challenging designs, always ensuring efficiency, security, and quality. I'm passionate about technology and innovation, and I am guided by values such as respect, honesty, communication, and hard work. I consider myself a tireless worker and will always contribute 110%, constantly seeking to learn and grow both professionally and personally.",
+  ],
+  /** Closes the section — the author's own choice of who to quote and why. */
+  aboutQuote: {
+    text: "I want to hear the best arguments against mine because I would like to find out where I am wrong and I would like to keep doing what I'm doing better.",
+    author: 'Jordan B. Peterson',
+  },
   education: {
     institution: 'Universidad Politécnica de Pachuca',
     degree: 'Software Engineering',

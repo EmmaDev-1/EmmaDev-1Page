@@ -100,7 +100,13 @@ export const profileSchema = z.object({
   /** One line under the headline. The design system's hero specifies one. */
   tagline: nonEmpty,
   aboutHeading: nonEmpty,
-  aboutBody: nonEmpty,
+  /** One entry per paragraph — the section renders each as its own block. */
+  aboutBody: z.array(nonEmpty).min(1),
+  /** An attributed line the author chose to close the section with. */
+  aboutQuote: z.object({
+    text: nonEmpty,
+    author: nonEmpty,
+  }),
   education: educationSchema,
   /**
    * The CV's own skills list — the whole toolkit, not one employer's slice.
