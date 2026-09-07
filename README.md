@@ -94,11 +94,18 @@ the arrival has already happened as an instant jump. Smooth is then left to what
 for — moving between sections once you are reading. Both halves are asserted in `e2e/`:
 that a cold deep link lands flush, and that a nav click still travels rather than cuts.
 
-**Sections land flush with the top of the viewport.** No nav clearance is added: each
-section carries 160px of its own top padding on desktop against a 77px bar, so the bar
-only ever overlaps empty padding. The offset is declared once, as `scroll-padding-top` on
-`<html>` — a `scroll-mt-*` on a section would stack on top of it rather than replace it,
-since the spec sums the container's scroll-padding with the target's scroll-margin.
+**Sections land flush with the top of the viewport.** No nav clearance is added, and the
+offset is declared once, as `scroll-padding-top` on `<html>` — a `scroll-mt-*` on a
+section would stack on top of it rather than replace it, since the spec sums the
+container's scroll-padding with the target's scroll-margin.
+
+Section padding is 30% of the design system's section rhythm: 48px on desktop, 24px on
+phones, down from 160/80px. Both that and the flush landing were the author's calls, and
+together they have one measured consequence: jumping _upward_ to a section is the only
+way to land at y=0 with the bar still on screen (scrolling down hides it), and there the
+section's eyebrow sits at 48px under a bar that ends at 77px. Left as is — undoing it
+means reinstating the offset and losing the flush landing. Phones are unaffected, the
+eyebrow landing at 64px exactly clear of the toggle disc.
 
 ### What this costs
 

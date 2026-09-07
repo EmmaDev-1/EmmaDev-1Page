@@ -194,12 +194,19 @@
     /*
       Sections land flush with the top of the viewport, by request.
 
-      No nav clearance is added here, and none is needed: every section carries
-      160px of its own top padding on desktop (80px on phones), while the bar
-      is 77px tall and the phone toggle bottoms out at 64px. The bar therefore
-      only ever overlaps a section's empty padding — its first heading sits
-      232px in — so an offset on top of that bought nothing but dead space
-      above every landing.
+      No nav clearance is added here. When that was decided, each section's own
+      160px of top padding cleared the 77px bar several times over, so an
+      offset would have bought nothing but dead space. That padding has since
+      been cut to 48px (24px on phones), also by request, and it no longer
+      clears the bar on desktop.
+
+      One case shows it: jumping *upward* to a section — the only way to land
+      at y=0 with the bar still on screen, since scrolling down hides it. The
+      section's eyebrow then sits at 48px, under a bar that ends at 77px.
+      Measured, and left as is, because the alternative is reinstating the
+      offset and giving up the flush landing that was asked for. Phones are
+      unaffected: 24px of padding puts the eyebrow at 64px, exactly clear of
+      the toggle disc.
 
       Note this is the only place the landing offset is declared. Adding
       `scroll-mt-*` to a section would not replace this value but stack on top

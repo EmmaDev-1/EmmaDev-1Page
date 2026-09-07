@@ -220,17 +220,28 @@ test.describe('desktop navigation', () => {
       await page.goto('/');
       const navbar = page.getByTestId('navbar');
 
+      /*
+       * Both positions are polled rather than read once. `data-visible` flips
+       * the instant the state changes, but the bar travels there over a CSS
+       * transition — sampling the box the moment the attribute flips catches
+       * it mid-flight (measured at y=-74 of a 77px bar) and fails for a
+       * reason that has nothing to do with the behaviour under test.
+       */
       await scrollUntil(page, 'navbar', 'false', 1200);
 
       // Off-screen, not merely transparent — assert the box actually moved out.
-      const hidden = await navbar.boundingBox();
-      expect(hidden).not.toBeNull();
-      expect(hidden!.y + hidden!.height).toBeLessThanOrEqual(0);
+      await expect
+        .poll(async () => {
+          const box = await navbar.boundingBox();
+          return box === null ? null : box.y + box.height;
+        })
+        .toBeLessThanOrEqual(0);
 
       await scrollUntil(page, 'navbar', 'true', -300);
 
-      const shown = await navbar.boundingBox();
-      expect(shown!.y).toBeGreaterThanOrEqual(0);
+      await expect
+        .poll(async () => (await navbar.boundingBox())?.y ?? null)
+        .toBeGreaterThanOrEqual(0);
     });
 
     test('comes back when the reader returns to the top', async ({ page }) => {
