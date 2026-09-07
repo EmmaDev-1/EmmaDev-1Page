@@ -110,6 +110,14 @@ explaining why:
    `SectionHeading`, `BlobPortrait`, `ResumePreview`, `GradientText`, `MediaCarousel`, `NavToggle`
    and `CursorTrail` are still the real components. All of them stay exported, since `ds:sync`
    requires every manifest component to be present and reachable.
+4. **The cursor trail only mounts where it has something to follow.** Its own guard asks for
+   `(hover: hover) and (pointer: fine)`, which a phone or tablet with a Bluetooth mouse or a stylus
+   answers yes to — and Android's "Desktop site" mode can report `hover: hover` outright — so on a
+   phone thirteen dots chased a finger they could not see and got in the way. `SiteChrome` decides
+   whether to render it at all, adding a `min-width: 768px` clause (`PRECISE_POINTER_QUERY` in
+   `lib/brand.ts`, in step with `--breakpoint-nav`). Gating the mount rather than patching the
+   component keeps the vendored file byte-identical, and the media query is watched, not read once,
+   so plugging in a mouse or resizing the window is honoured mid-session.
 
 Values that genuinely cannot use a token — the `theme-color` meta tag, the Satori-rendered OG
 image, an `IntersectionObserver` rootMargin — live in `src/lib/brand.ts`, the one file the

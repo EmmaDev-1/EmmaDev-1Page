@@ -53,6 +53,23 @@ export const OG_BLOOM_BLUR = 'blur(140px)';
 export const SCROLL_SPY_ROOT_MARGIN = '-45% 0px -45% 0px';
 
 /**
+ * Where the cursor trail is allowed to run.
+ *
+ * The trail is a pointer flourish, so it needs a real pointer — but asking only
+ * for one is not enough. A phone or tablet with a Bluetooth mouse or a stylus
+ * reports `pointer: fine`, and Android's "Desktop site" mode can report
+ * `hover: hover`, so a pointer-only test lets thirteen dots loose on a phone
+ * where they have nothing to follow and simply sit in the way. The width clause
+ * is what actually answers "is this a phone".
+ *
+ * The 768px must stay in step with --breakpoint-nav in globals.css. It is
+ * repeated rather than read back because Tailwind compiles that token into the
+ * media queries it generates and never emits it as a custom property, so there
+ * is nothing to read at runtime.
+ */
+export const PRECISE_POINTER_QUERY = '(hover: hover) and (pointer: fine) and (min-width: 768px)';
+
+/**
  * The design system's reveal veil (--blur-veil) as a ready-made filter value.
  */
 export const BLUR_VEIL = 'blur(5px)';

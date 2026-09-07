@@ -1,5 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
+/** The trail's dots. It renders nothing at all when it is not wanted. */
+const CURSOR_TRAIL_DOTS = 'body > div[aria-hidden="true"] > span';
+
 /**
  * Scrolls until the chrome element reaches `expected`, nudging repeatedly.
  *
@@ -111,6 +114,31 @@ test.describe('desktop navigation', () => {
     await expect(projectsLink).toBeVisible();
   });
 
+  test.describe('cursor trail', () => {
+    test('runs where there is a pointer and room for it', async ({ page }) => {
+      await page.goto('/');
+      await expect(page.locator(CURSOR_TRAIL_DOTS)).toHaveCount(13);
+    });
+
+    test('drops away on a phone-sized viewport even with a mouse', async ({ page }) => {
+      /*
+       * The gap the vendored guard leaves: it asks only for a precise pointer,
+       * which a phone or tablet with a Bluetooth mouse or a stylus reports, so
+       * thirteen dots ended up following nothing on a phone. This project has a
+       * real pointer throughout, so narrowing the viewport isolates the width
+       * clause — and proves the query is watched rather than read once at mount.
+       */
+      await page.goto('/');
+      await expect(page.locator(CURSOR_TRAIL_DOTS)).toHaveCount(13);
+
+      await page.setViewportSize({ width: 390, height: 800 });
+      await expect(page.locator(CURSOR_TRAIL_DOTS)).toHaveCount(0);
+
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await expect(page.locator(CURSOR_TRAIL_DOTS)).toHaveCount(13);
+    });
+  });
+
   test.describe('jump-link landing', () => {
     /**
      * `scroll-padding-top` on <html> and `scroll-margin-top` on the target both
@@ -213,10 +241,8 @@ test.describe('mobile navigation', () => {
 
   test('never mounts the cursor trail on a touch device', async ({ page }) => {
     await page.goto('/');
-    // CursorTrail checks (hover:hover) and (pointer:fine) and renders null
-    // when neither matches, rather than rendering dots and hiding them.
-    const dotCount = await page.locator('body > div[aria-hidden="true"] > span').count();
-    expect(dotCount).toBe(0);
+    // Not rendered at all, rather than rendered and hidden.
+    await expect(page.locator(CURSOR_TRAIL_DOTS)).toHaveCount(0);
   });
 
   test.describe('toggle hides on scroll', () => {

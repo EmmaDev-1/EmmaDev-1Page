@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { CursorTrail, NavToggle } from '@/components/design-system';
 import { SECTION_IDS } from '@/content';
-import { useBodyScrollLock, useNavVisibility, useScrollSpy } from '@/lib/hooks';
+import { useBodyScrollLock, useNavVisibility, usePrecisePointer, useScrollSpy } from '@/lib/hooks';
 import { MobileMenu } from './MobileMenu';
 import { ScrollProgress } from './ScrollProgress';
 import { SectionRail } from './SectionRail';
@@ -33,6 +33,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const activeHref = `#${activeId}`;
 
   const navVisible = useNavVisibility();
+  const precisePointer = usePrecisePointer();
   /* The bar earns its glass once the hero is no longer what is behind it. */
   const condensed = activeId !== SECTION_IDS.home;
 
@@ -109,7 +110,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
       <main id="main">{children}</main>
 
-      <CursorTrail />
+      {/*
+        The trail is not rendered at all on phones. Its own guard checks for a
+        precise pointer, which a tablet or phone with a Bluetooth mouse or a
+        stylus satisfies — so the dots would follow nothing and sit in the way.
+        Gating it here rather than patching the vendored component keeps that
+        file byte-identical to upstream.
+      */}
+      {precisePointer ? <CursorTrail /> : null}
     </>
   );
 }

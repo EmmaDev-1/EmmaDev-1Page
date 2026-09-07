@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SCROLL_SPY_ROOT_MARGIN } from './brand';
+import { PRECISE_POINTER_QUERY, SCROLL_SPY_ROOT_MARGIN } from './brand';
 
 /**
  * Tracks which section is currently in view so the nav can mark it active.
@@ -112,6 +112,28 @@ export function useNavVisibility({
   }, [threshold, revealAbove]);
 
   return visible;
+}
+
+/**
+ * True only where a pointer flourish makes sense: a real pointer, on a screen
+ * that is not phone-sized.
+ *
+ * Reactive rather than read once — a mouse can be connected or disconnected,
+ * and a window can be resized across the breakpoint, mid-session.
+ */
+export function usePrecisePointer(): boolean {
+  const [precise, setPrecise] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia(PRECISE_POINTER_QUERY);
+    const update = () => setPrecise(query.matches);
+
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  return precise;
 }
 
 /** Mirrors the user's reduced-motion setting, and keeps mirroring it if it changes. */
