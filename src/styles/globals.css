@@ -194,19 +194,16 @@
     /*
       Sections land flush with the top of the viewport, by request.
 
-      No nav clearance is added here. When that was decided, each section's own
-      160px of top padding cleared the 77px bar several times over, so an
-      offset would have bought nothing but dead space. That padding has since
-      been cut to 48px (24px on phones), also by request, and it no longer
-      clears the bar on desktop.
+      No nav clearance is added here, because each section already carries its
+      own: 80px of top padding, against a bar that ends at 77px and a phone
+      toggle that ends at 66px. An offset here would only stack on that.
 
-      One case shows it: jumping *upward* to a section — the only way to land
-      at y=0 with the bar still on screen, since scrolling down hides it. The
-      section's eyebrow then sits at 48px, under a bar that ends at 77px.
-      Measured, and left as is, because the alternative is reinstating the
-      offset and giving up the flush landing that was asked for. Phones are
-      unaffected: 24px of padding puts the eyebrow at 64px, exactly clear of
-      the toggle disc.
+      That relationship is load-bearing rather than incidental. A section can
+      land at y=0 with the chrome still on screen — it happens on any jump
+      *upward*, since scrolling down hides it — and a section's eyebrow sits
+      exactly at its padding. Trimming that padding below the chrome's height
+      puts the eyebrow underneath it, measured and confirmed when 48px was
+      briefly tried. See components/ui/Section.tsx.
 
       Note this is the only place the landing offset is declared. Adding
       `scroll-mt-*` to a section would not replace this value but stack on top

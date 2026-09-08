@@ -99,13 +99,13 @@ offset is declared once, as `scroll-padding-top` on `<html>` — a `scroll-mt-*`
 section would stack on top of it rather than replace it, since the spec sums the
 container's scroll-padding with the target's scroll-margin.
 
-Section padding is 30% of the design system's section rhythm: 48px on desktop, 24px on
-phones, down from 160/80px. Both that and the flush landing were the author's calls, and
-together they have one measured consequence: jumping _upward_ to a section is the only
-way to land at y=0 with the bar still on screen (scrolling down hides it), and there the
-section's eyebrow sits at 48px under a bar that ends at 77px. Left as is — undoing it
-means reinstating the offset and losing the flush landing. Phones are unaffected, the
-eyebrow landing at 64px exactly clear of the toggle disc.
+Sections carry 80px of vertical padding at every width — half the design system's rhythm
+on desktop, unchanged from it on phones — and that number is a floor rather than a
+preference. A section's eyebrow sits exactly at its padding, and a section can land at
+y=0 with the chrome still on screen, which happens on any jump _upward_ since scrolling
+down hides it. The desktop bar ends at 77px and the phone toggle disc at 66px, so 80px
+clears them by 3px and 14px. Trimming it to 48/24px put the eyebrow underneath both,
+measured on the way to this value.
 
 ### What this costs
 

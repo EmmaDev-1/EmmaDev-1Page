@@ -23,11 +23,22 @@ export function Section({ id, children, narrow = false, className = '' }: Props)
     <section
       id={id}
       /*
-        Vertical padding is 30% of what the design system's section rhythm
-        called for — 160/80px cut to 48/24px, at the author's request: the gap
-        it left above each heading read as the section failing to start rather
-        than as breathing room, especially now that sections land flush with
-        the top of the viewport. Horizontal gutters are untouched.
+        80px of vertical padding at every width — half the design system's
+        section rhythm on desktop, and unchanged from it on phones. Horizontal
+        gutters are untouched; the request was about height.
+
+        The desktop 160px read as the section failing to start rather than as
+        breathing room, the more so since sections began landing flush with the
+        top of the viewport: a jump delivered a screenful of nothing first.
+
+        80px is a floor, not a waypoint. It is what clears the chrome when a
+        section lands at y=0 with that chrome on screen — which happens on any
+        jump *upward*, since scrolling down hides it. The desktop bar ends at
+        77px and the phone's toggle disc at 66px, so a section's eyebrow, which
+        sits exactly at this padding, clears them by 3px and 14px. Both were
+        measured underneath at the 48/24px first tried: hence one value here
+        rather than a smaller one for phones, where there was never any room to
+        give.
 
         No scroll-mt-* here. The nav-clearance offset for hash navigation is
         declared exactly once, globally, as `scroll-padding-top` on <html>
@@ -37,7 +48,7 @@ export function Section({ id, children, narrow = false, className = '' }: Props)
         scroll-mt-20 doubled the offset to 160px, landing every section that
         much further down than intended.
       */
-      className={`px-5 py-6 nav:px-12 nav:py-12 ${className}`}
+      className={`px-5 py-20 nav:px-12 ${className}`}
     >
       <div className={`mx-auto w-full ${narrow ? 'max-w-narrow' : 'max-w-content'}`}>
         {children}

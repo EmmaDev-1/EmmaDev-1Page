@@ -20,6 +20,44 @@ async function landed(page: Page, id: string): Promise<void> {
 }
 
 /**
+ * Where the section's first line of real text sits, in viewport coordinates.
+ *
+ * Walked rather than selected: which element carries a section's eyebrow is
+ * the design system's business, and a test that hard-codes it would be
+ * asserting markup instead of what a reader can see.
+ */
+async function firstTextTop(page: Page, id: string): Promise<number> {
+  const top = await page.evaluate((target) => {
+    const section = document.getElementById(target);
+    if (!section) return null;
+    const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT);
+    let node = walker.nextNode();
+    while (node) {
+      const parent = node.parentElement;
+      if (node.textContent?.trim() && parent) {
+        const box = parent.getBoundingClientRect();
+        if (box.height > 0) return box.top;
+      }
+      node = walker.nextNode();
+    }
+    return null;
+  }, id);
+
+  expect(top, `no visible text found in #${id}`).not.toBeNull();
+  return top as number;
+}
+
+/** The bottom edge of a chrome element, or null when it is not on screen. */
+async function chromeBottom(page: Page, testId: string): Promise<number | null> {
+  return page.evaluate((id) => {
+    const el = document.querySelector(`[data-testid="${id}"]`);
+    if (!el || el.getAttribute('data-visible') !== 'true') return null;
+    if (Number(getComputedStyle(el).opacity) === 0) return null;
+    return el.getBoundingClientRect().bottom;
+  }, testId);
+}
+
+/**
  * Scrolls until the chrome element reaches `expected`, nudging repeatedly.
  *
  * A single wheel plus a fixed wait is not reliable here. The very first wheel
@@ -178,6 +216,36 @@ test.describe('desktop navigation', () => {
         expect(Math.abs(top)).toBeLessThan(4);
       });
     }
+
+    test('keeps the bar off the section it lands on', async ({ page }) => {
+      /*
+       * Sections land at y=0 and carry no scroll offset, so the only thing
+       * keeping the bar off their first line is the section's own top padding
+       * — 80px against a bar ending at 77px. That is a floor, and it has been
+       * dropped through twice: once by removing the offset, once by trimming
+       * the padding to 48px. Both times the eyebrow ended up underneath.
+       *
+       * Jumping *upward* is the case that exposes it, and the only way to land
+       * at y=0 with the bar still on screen, since scrolling down hides it.
+       */
+      await page.goto('/');
+      await page.waitForTimeout(800);
+
+      await page.evaluate(() =>
+        document.getElementById('curriculum')?.scrollIntoView({ behavior: 'instant' }),
+      );
+      await page.waitForTimeout(600);
+      // Nudged until the bar is actually back, not once and hoped: it is off
+      // screen down here, and an unrevealed bar makes the link unclickable.
+      await scrollUntil(page, 'navbar', 'true', -250);
+
+      await page.click('header a[href="#about"]');
+      await landed(page, 'about');
+
+      const barBottom = await chromeBottom(page, 'navbar');
+      expect(barBottom, 'the bar should still be on screen after jumping up').not.toBeNull();
+      expect(await firstTextTop(page, 'about')).toBeGreaterThanOrEqual(barBottom as number);
+    });
 
     test('travels between sections rather than cutting to them', async ({ page }) => {
       /*
@@ -368,6 +436,34 @@ test.describe('mobile navigation', () => {
 
     await page.getByRole('button', { name: 'Close menu' }).click();
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
+  });
+
+  test('keeps the toggle off the section it lands on', async ({ page }) => {
+    /*
+     * The phone's counterpart to the desktop clearance test, and the tighter
+     * of the two: the toggle disc ends at 66px against the same 80px of
+     * section padding, and Projects and Career left-align their eyebrow into
+     * exactly the corner the disc occupies. Trimming the padding to 24px put
+     * "02 — Work" underneath it — measured, which is why phones kept the full
+     * 80px when desktop was halved.
+     */
+    await page.goto('/');
+    await page.waitForTimeout(800);
+
+    // Deep, then reveal the toggle, then jump back up through the menu.
+    await page.evaluate(() =>
+      document.getElementById('curriculum')?.scrollIntoView({ behavior: 'instant' }),
+    );
+    await page.waitForTimeout(600);
+    await scrollUntil(page, 'nav-toggle', 'true', -250);
+
+    await page.getByRole('button', { name: 'Open menu' }).click();
+    await menu(page).getByRole('link', { name: 'Projects' }).click();
+    await landed(page, 'projects');
+
+    const discBottom = await chromeBottom(page, 'nav-toggle');
+    expect(discBottom, 'the toggle should be on screen after jumping up').not.toBeNull();
+    expect(await firstTextTop(page, 'projects')).toBeGreaterThanOrEqual(discBottom as number);
   });
 
   test('closes the menu when a link is followed', async ({ page }) => {
