@@ -142,6 +142,18 @@ test.describe('portfolio', () => {
     await expect(email).toHaveAttribute('href', 'mailto:emmanueldev3a@gmail.com');
   });
 
+  test('offers the phone as a WhatsApp chat, and as a readable number', async ({ page }) => {
+    const chat = page.getByRole('link', { name: /WhatsApp/ });
+    await chat.scrollIntoViewIfNeeded();
+
+    // wa.me takes the country code and digits only — no `+`, spaces or dashes.
+    // The visible text keeps all three, so the two are asserted separately:
+    // the href is what opens the chat, the text is what can be copied or
+    // dialled by someone without WhatsApp installed.
+    await expect(chat).toHaveAttribute('href', 'https://wa.me/527717774411');
+    await expect(chat).toContainText('+52 771 777 4411');
+  });
+
   test('publishes structured data describing the author', async ({ page }) => {
     const raw = await page.locator('script[type="application/ld+json"]').textContent();
     const data = JSON.parse(raw ?? '{}');

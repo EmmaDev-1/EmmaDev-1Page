@@ -91,6 +91,13 @@ export const profile: Profile = profileSchema.parse({
     },
   },
   email: 'emmanueldev3a@gmail.com',
+  /*
+   * +52 is Mexico; 771 is Pachuca, where the degree on `education` is from.
+   * Written the way it would be dialled from abroad rather than as the bare
+   * ten digits, since the footer both shows this and derives a wa.me link from
+   * it, and that link is meaningless without the country code.
+   */
+  phone: '+52 771 777 4411',
   social: [
     {
       network: 'linkedin',

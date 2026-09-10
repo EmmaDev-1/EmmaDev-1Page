@@ -12,15 +12,26 @@ import { profile } from '@/content';
  * none — the page simply stopped after the CV, which leaves a portfolio
  * without the one thing it exists to prompt: getting in touch.
  *
- * Contact runs through LinkedIn rather than a mailto. The CV carries two email
- * addresses and a phone number, but those reach the reader inside a downloaded
- * PDF; putting them in page markup publishes them to every scraper that walks
- * the site. LinkedIn is the channel that is already public by design.
+ * Three ways to make contact, in the order someone is likely to want them: the
+ * email in full, WhatsApp, then LinkedIn. All three were originally kept out
+ * of the markup bar LinkedIn — the reasoning being that the CV holds them and
+ * the CV is a download, so publishing them here only fed scrapers. The author
+ * has since asked for each of the others in turn, which is his call to make:
+ * the same CV is served from this site, so the addresses were public already,
+ * and a portfolio that hides how to reach its author is working against itself.
  */
 export function SiteFooter() {
   const year = new Date().getFullYear();
   const linkedin = profile.social.find((link) => link.network === 'linkedin');
   const [emailLocalPart, emailDomain] = profile.email.split('@');
+
+  /*
+   * wa.me accepts the number as digits only, country code included and no
+   * punctuation — so this strips what `profile.phone` carries for legibility
+   * rather than keeping a second, pre-formatted copy of the number around to
+   * fall out of step with the one on screen.
+   */
+  const whatsappHref = `https://wa.me/${profile.phone.replace(/\D/g, '')}`;
 
   return (
     <footer className="relative overflow-hidden border-t border-hairline px-5 py-24 nav:px-12">
@@ -69,16 +80,40 @@ export function SiteFooter() {
             {emailDomain}
           </a>
 
-          {linkedin ? (
+          {/*
+            The two lighter channels, grouped: the email above is the primary
+            one and keeps its own weight, while these two sit together as
+            alternatives rather than as three equal shouts. gap-3 rather than
+            the column's gap-8, so they read as a pair.
+          */}
+          <div className="flex flex-col items-start gap-3">
+            {/*
+              The number is the link text, for the same reason the address is
+              above it: WhatsApp may not be installed, and a reader who wants to
+              save the number or ring it instead still needs to be able to read
+              and copy it. `tabular-nums` keeps the digit groups evenly spaced
+              rather than letting the proportional font ripple them.
+            */}
             <a
-              href={linkedin.href}
+              href={whatsappHref}
               target="_blank"
               rel="noreferrer"
-              className="text-body-lg text-ink-300 underline decoration-strong underline-offset-8 transition-colors duration-normal ease-standard hover:decoration-accent hover:text-ink-000"
+              className="text-body-lg text-ink-300 underline decoration-strong underline-offset-8 transition-colors duration-normal ease-standard [font-variant-numeric:tabular-nums] hover:decoration-accent hover:text-ink-000"
             >
-              or reach me on LinkedIn
+              {profile.phone} on WhatsApp
             </a>
-          ) : null}
+
+            {linkedin ? (
+              <a
+                href={linkedin.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-body-lg text-ink-300 underline decoration-strong underline-offset-8 transition-colors duration-normal ease-standard hover:decoration-accent hover:text-ink-000"
+              >
+                or reach me on LinkedIn
+              </a>
+            ) : null}
+          </div>
         </Reveal>
 
         <div className="flex flex-col-reverse items-start justify-between gap-8 border-t border-hairline pt-8 nav:flex-row nav:items-center">

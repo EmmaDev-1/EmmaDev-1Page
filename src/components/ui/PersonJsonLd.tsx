@@ -19,6 +19,10 @@ export function PersonJsonLd() {
     jobTitle: profile.role,
     description: profile.aboutBody.join(' '),
     email: profile.email,
+    // Kept in its readable international form rather than the digits the
+    // wa.me link uses: schema.org wants a number a human or a dialler can
+    // act on, not a URL path segment.
+    telephone: profile.phone,
     sameAs: profile.social.map((link) => link.href),
     worksFor: experience.map((role) => ({ '@type': 'Organization', name: role.org })),
     alumniOf: {

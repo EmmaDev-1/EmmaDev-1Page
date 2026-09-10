@@ -128,6 +128,19 @@ export const profileSchema = z.object({
    * most direct way to reach him.
    */
   email: z.email(),
+  /**
+   * Published at the author's request, as a WhatsApp contact.
+   *
+   * Stored in international form because that is the only form the wa.me link
+   * can be derived from — the link wants the country code and nothing but
+   * digits. Deriving it rather than storing the link alongside the number is
+   * what stops the number a reader can read from drifting away from the one
+   * the link actually opens a chat with.
+   */
+  phone: nonEmpty.regex(
+    /^\+\d{1,4}(?: \d+)+$/,
+    'phone must be international, digits grouped by spaces — e.g. "+52 771 777 4411"',
+  ),
   social: z.array(socialLinkSchema).min(1),
 });
 
