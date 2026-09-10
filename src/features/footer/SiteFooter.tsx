@@ -3,6 +3,7 @@
 import { SocialIconLink } from '@/components/design-system';
 import { LineReveal } from '@/components/motion/LineReveal';
 import { Reveal } from '@/components/motion/Reveal';
+import { WhatsAppIconLink } from '@/components/ui/ContactIconLink';
 import { profile } from '@/content';
 import { whatsappHref } from '@/lib/contact';
 
@@ -128,6 +129,15 @@ export function SiteFooter() {
                 />
               </li>
             ))}
+            {/*
+              WhatsApp is also the text link up in "Get in touch" — the same
+              doubling LinkedIn already has here, prose above and mark below.
+              The two are not redundant: the line above is the number, to read
+              or dial; this is the one-tap mark, in the row it belongs to.
+            */}
+            <li>
+              <WhatsAppIconLink size={26} />
+            </li>
           </ul>
         </div>
       </div>

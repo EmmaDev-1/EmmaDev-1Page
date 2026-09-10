@@ -168,9 +168,9 @@ test.describe('portfolio', () => {
   });
 
   test('offers the phone as a WhatsApp chat, and as a readable number', async ({ page }) => {
-    // Scoped to the footer: the nav carries the same contact as an icon, and
-    // an unscoped match now finds both.
-    const chat = page.locator('footer').getByRole('link', { name: /WhatsApp/ });
+    // The readable text link, not the icon: the footer now carries both, so
+    // this matches on "on WhatsApp" — the icon's name is just "WhatsApp chat".
+    const chat = page.locator('footer').getByRole('link', { name: /on WhatsApp/ });
     await chat.scrollIntoViewIfNeeded();
 
     // wa.me takes the country code and digits only — no `+`, spaces or dashes.
@@ -179,6 +179,31 @@ test.describe('portfolio', () => {
     // dialled by someone without WhatsApp installed.
     await expect(chat).toHaveAttribute('href', 'https://wa.me/527717774411');
     await expect(chat).toContainText('+52 771 777 4411');
+  });
+
+  test('puts the WhatsApp mark in every icon row', async ({ page }) => {
+    /*
+     * The mark sits with the social icons in three places — the hero, the nav
+     * bar and the footer — and is the same `WhatsAppIconLink` in all three, so
+     * one wrong href would be wrong everywhere. The nav bar is desktop-only,
+     * so its own presence is asserted in the desktop suite; here it is the
+     * hero and footer, which render at every width.
+     */
+    const marks = page.getByRole('link', { name: 'WhatsApp chat' });
+
+    // Hero row, above the fold.
+    await expect(page.locator('#home').getByRole('link', { name: 'WhatsApp chat' })).toBeVisible();
+
+    // Footer row, next to the profile marks.
+    const footerMark = page.locator('footer').getByRole('link', { name: 'WhatsApp chat' });
+    await footerMark.scrollIntoViewIfNeeded();
+    await expect(footerMark).toBeVisible();
+
+    // Every one of them opens the same chat in its own tab.
+    for (const mark of await marks.all()) {
+      await expect(mark).toHaveAttribute('href', 'https://wa.me/527717774411');
+      await expect(mark).toHaveAttribute('rel', 'noreferrer');
+    }
   });
 
   test('publishes structured data describing the author', async ({ page }) => {
@@ -610,7 +635,9 @@ test.describe('mobile navigation', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Open menu' }).click();
 
-    const chat = page.getByRole('link', { name: 'WhatsApp chat' });
+    // Scoped to the open menu: the hero and footer carry the same mark, so an
+    // unscoped match finds three.
+    const chat = page.getByTestId('mobile-menu').getByRole('link', { name: 'WhatsApp chat' });
     await expect(chat).toBeVisible();
     await expect(chat).toHaveAttribute('href', 'https://wa.me/527717774411');
   });

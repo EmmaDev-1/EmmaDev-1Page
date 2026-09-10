@@ -2,10 +2,9 @@
 
 import { motion } from 'motion/react';
 import { NavLink, SocialIconLink } from '@/components/design-system';
-import { ContactIconLink } from '@/components/ui/ContactIconLink';
+import { WhatsAppIconLink } from '@/components/ui/ContactIconLink';
 import { navItems, profile } from '@/content';
 import { BLUR_NONE } from '@/lib/brand';
-import { whatsappHref } from '@/lib/contact';
 import { DURATION, EASE } from '@/lib/motion';
 
 /**
@@ -61,18 +60,7 @@ export function TopBar({ activeHref, condensed }: { activeHref: string; condense
           />
         ))}
 
-        {/*
-          WhatsApp sits with the profiles but is not one: it opens a chat
-          rather than a page about him, which is also why it stays out of
-          `profile.social` — that list feeds the JSON-LD's `sameAs`, and a
-          chat link is not something that verifies an identity.
-        */}
-        <ContactIconLink
-          href={whatsappHref(profile.phone)}
-          src="/icons/whatsapp.png"
-          label="WhatsApp chat"
-          size={26}
-        />
+        <WhatsAppIconLink size={26} />
       </div>
     </motion.header>
   );

@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { useRef } from 'react';
 import { Button, GradientText, SocialIconLink } from '@/components/design-system';
 import { LineReveal } from '@/components/motion/LineReveal';
+import { WhatsAppIconLink } from '@/components/ui/ContactIconLink';
 import { Icon } from '@/components/ui/Icon';
 import { profile, SECTION_IDS } from '@/content';
 import { DURATION, EASE } from '@/lib/motion';
@@ -114,6 +115,10 @@ export function HeroSection() {
               />
             </li>
           ))}
+          <li>
+            {/* Same default 38px edge as the SocialIconLinks above it. */}
+            <WhatsAppIconLink size={38} />
+          </li>
         </motion.ul>
       </motion.div>
 

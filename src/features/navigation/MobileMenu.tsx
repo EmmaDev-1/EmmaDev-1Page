@@ -3,9 +3,8 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { navItems, profile } from '@/content';
 import { SocialIconLink } from '@/components/design-system';
-import { ContactIconLink } from '@/components/ui/ContactIconLink';
+import { WhatsAppIconLink } from '@/components/ui/ContactIconLink';
 import { Icon } from '@/components/ui/Icon';
-import { whatsappHref } from '@/lib/contact';
 import { DURATION, EASE, lineMask } from '@/lib/motion';
 
 /**
@@ -34,6 +33,7 @@ export function MobileMenu({
     <AnimatePresence>
       {open ? (
         <motion.div
+          data-testid="mobile-menu"
           className="fixed inset-0 z-[900] flex flex-col justify-center bg-page px-5 nav:hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -120,17 +120,11 @@ export function MobileMenu({
             ))}
 
             {/*
-              The same row as the desktop bar's. It has to be here too, not
-              only in TopBar: below 768px that bar does not render at all, so
-              this menu *is* the nav, and leaving WhatsApp out of it would hide
-              the contact from exactly the readers most likely to tap it.
+              Below 768px the desktop bar does not render at all, so this menu
+              is the nav — leaving WhatsApp out of it would hide the contact
+              from exactly the readers most likely to tap it.
             */}
-            <ContactIconLink
-              href={whatsappHref(profile.phone)}
-              src="/icons/whatsapp.png"
-              label="WhatsApp chat"
-              size={28}
-            />
+            <WhatsAppIconLink size={28} />
           </motion.div>
         </motion.div>
       ) : null}

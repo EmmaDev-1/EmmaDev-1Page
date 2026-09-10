@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import { profile } from '@/content';
+import { whatsappHref } from '@/lib/contact';
 
 type Props = {
   href: string;
@@ -50,5 +52,31 @@ export function ContactIconLink({ href, src, label, size }: Props) {
         className="transition-[transform,filter] duration-normal ease-out-soft group-hover:scale-[var(--scale-icon-hover)] group-hover:brightness-200"
       />
     </a>
+  );
+}
+
+/**
+ * The WhatsApp chat as an icon link — the one concrete use of ContactIconLink,
+ * and now in three rows: the nav bar, the hero, and the footer.
+ *
+ * A wrapper rather than the four props written out at each site, for the same
+ * reason `whatsappHref` itself was pulled into `lib/contact`: the number, the
+ * mark and the label are the same in all three, and one of them changing
+ * should not be three edits. Only `size` varies, tracking the social marks in
+ * whichever row it joins.
+ *
+ * It sits with the social marks but is deliberately not one of them — it opens
+ * a chat, not a page about him — which is why it stays out of `profile.social`.
+ * That array feeds the JSON-LD's `sameAs`, and a chat link is not something
+ * that verifies an identity.
+ */
+export function WhatsAppIconLink({ size }: { size: number }) {
+  return (
+    <ContactIconLink
+      href={whatsappHref(profile.phone)}
+      src="/icons/whatsapp.png"
+      label="WhatsApp chat"
+      size={size}
+    />
   );
 }
