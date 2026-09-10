@@ -158,6 +158,14 @@ explaining why:
    `lib/brand.ts`, in step with `--breakpoint-nav`). Gating the mount rather than patching the
    component keeps the vendored file byte-identical, and the media query is watched, not read once,
    so plugging in a mouse or resizing the window is honoured mid-session.
+5. **A third icon in the social row.** `SocialIconLink` builds its own source as
+   `${assetBase}/${network}.png` and types `network` as `github | linkedin` — a contract the
+   adherence rules enforce independently, so a WhatsApp mark could only go through it by editing a
+   vendored file or evading the rule guarding it. `components/ui/ContactIconLink.tsx` reproduces the
+   grammar from the same tokens instead: the 44px tap target (`--tap-min`), the mark scaling to
+   `--scale-icon-hover` and doubling in brightness over `--dur-normal`. Measured against the real
+   component beside it, the resting geometry is identical — 26×26 in a 44×44 target, on the same
+   baseline. Hover is CSS rather than React state, so it needs no client boundary of its own.
 
 Values that genuinely cannot use a token — the `theme-color` meta tag, the Satori-rendered OG
 image, an `IntersectionObserver` rootMargin — live in `src/lib/brand.ts`, the one file the

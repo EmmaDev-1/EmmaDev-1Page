@@ -143,7 +143,9 @@ test.describe('portfolio', () => {
   });
 
   test('offers the phone as a WhatsApp chat, and as a readable number', async ({ page }) => {
-    const chat = page.getByRole('link', { name: /WhatsApp/ });
+    // Scoped to the footer: the nav carries the same contact as an icon, and
+    // an unscoped match now finds both.
+    const chat = page.locator('footer').getByRole('link', { name: /WhatsApp/ });
     await chat.scrollIntoViewIfNeeded();
 
     // wa.me takes the country code and digits only — no `+`, spaces or dashes.
@@ -170,6 +172,20 @@ test.describe('portfolio', () => {
 
 test.describe('desktop navigation', () => {
   test.skip(({ isMobile }) => !!isMobile, 'desktop bar is hidden below 768px');
+
+  test('carries the WhatsApp contact beside the profile marks', async ({ page }) => {
+    await page.goto('/');
+
+    const bar = page.locator('header');
+    const chat = bar.getByRole('link', { name: 'WhatsApp chat' });
+    await expect(chat).toBeVisible();
+    await expect(chat).toHaveAttribute('href', 'https://wa.me/527717774411');
+
+    // Third in the row, after the two profile marks, and opening in its own
+    // tab exactly as they do.
+    await expect(bar.locator('a[target="_blank"]')).toHaveCount(3);
+    await expect(chat).toHaveAttribute('rel', 'noreferrer');
+  });
 
   test('marks the section in view as active', async ({ page }) => {
     await page.goto('/');
@@ -561,6 +577,17 @@ test.describe('mobile navigation', () => {
       await page.getByRole('button', { name: 'Open menu' }).focus();
       await expectOpacity(page, 1);
     });
+  });
+
+  test('carries the WhatsApp contact in the menu too', async ({ page }) => {
+    // Below 768px the desktop bar does not render at all, so the menu is the
+    // nav — and is where a reader on a phone would reach for WhatsApp.
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Open menu' }).click();
+
+    const chat = page.getByRole('link', { name: 'WhatsApp chat' });
+    await expect(chat).toBeVisible();
+    await expect(chat).toHaveAttribute('href', 'https://wa.me/527717774411');
   });
 
   test('keeps the menu social links on screen', async ({ page }) => {

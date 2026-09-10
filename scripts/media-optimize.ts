@@ -94,6 +94,16 @@ const copyJobs = [
   { from: 'docs/Emmanuel_Aguilar_CV.pdf', to: 'docs/Emmanuel_Aguilar_CV.pdf' },
 ];
 
+/**
+ * The WhatsApp mark, the one icon that is resized rather than copied.
+ *
+ * It arrived at 1000x1000 and 44KB against the design system's own marks at
+ * 256/512px and 3-6KB, for something drawn at 26px. Matched to LinkedIn's
+ * 256px, which still leaves headroom for a 3x display. PNG with its alpha
+ * intact, because it sits on the page background rather than on a plate.
+ */
+const iconJob = { from: 'icons/whatsapp-vector.png', to: 'icons/whatsapp.png', size: 256 };
+
 /** H.264 needs even dimensions; VP9 is happier with them too. */
 const even = (n: number) => Math.max(2, Math.round(n / 2) * 2);
 
@@ -238,6 +248,28 @@ async function encodeVideo(job: VideoJob): Promise<{ before: number; after: numb
  * tab icon (the App Router auto-serves any icon.(png|svg|ico) placed at the
  * app root), and the one output this pipeline places outside public/.
  */
+/** Resizes a transparent mark, keeping its alpha and its format. */
+async function encodeIcon(job: typeof iconJob): Promise<{ before: number; after: number }> {
+  const input = path.join(SRC, job.from);
+  const output = path.join(PUBLIC, job.to);
+  await mkdir(path.dirname(output), { recursive: true });
+
+  await sharp(input)
+    // `inside` rather than the stills' `cover`: a mark must not be cropped,
+    // and these are square already so nothing is letterboxed either.
+    .resize(job.size, job.size, { fit: 'inside' })
+    .png({ compressionLevel: 9, palette: true })
+    .toFile(output);
+
+  const before = await sizeOf(input);
+  const after = await sizeOf(output);
+  console.log(
+    `  ${job.from.padEnd(30)} ${kb(before).padStart(10)} -> ${kb(after).padStart(9)}  ` +
+      `(${(100 - (after / before) * 100).toFixed(1)}% smaller, ${job.size}px)`,
+  );
+  return { before, after };
+}
+
 async function encodeFavicon(): Promise<{ before: number; after: number }> {
   const from = 'aboutMe/EmmaDevAnimated2.jpeg';
   const input = path.join(SRC, from);
@@ -301,6 +333,13 @@ async function main(): Promise<void> {
   console.log('\nRe-encoding stills (-> WebP)');
   for (const job of imageJobs) {
     const r = await encodeImage(job);
+    before += r.before;
+    after += r.after;
+  }
+
+  console.log('\nResizing the WhatsApp mark');
+  {
+    const r = await encodeIcon(iconJob);
     before += r.before;
     after += r.after;
   }

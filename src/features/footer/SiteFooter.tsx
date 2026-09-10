@@ -4,6 +4,7 @@ import { SocialIconLink } from '@/components/design-system';
 import { LineReveal } from '@/components/motion/LineReveal';
 import { Reveal } from '@/components/motion/Reveal';
 import { profile } from '@/content';
+import { whatsappHref } from '@/lib/contact';
 
 /**
  * Closing panel.
@@ -25,13 +26,7 @@ export function SiteFooter() {
   const linkedin = profile.social.find((link) => link.network === 'linkedin');
   const [emailLocalPart, emailDomain] = profile.email.split('@');
 
-  /*
-   * wa.me accepts the number as digits only, country code included and no
-   * punctuation — so this strips what `profile.phone` carries for legibility
-   * rather than keeping a second, pre-formatted copy of the number around to
-   * fall out of step with the one on screen.
-   */
-  const whatsappHref = `https://wa.me/${profile.phone.replace(/\D/g, '')}`;
+  const whatsapp = whatsappHref(profile.phone);
 
   return (
     <footer className="relative overflow-hidden border-t border-hairline px-5 py-24 nav:px-12">
@@ -95,7 +90,7 @@ export function SiteFooter() {
               rather than letting the proportional font ripple them.
             */}
             <a
-              href={whatsappHref}
+              href={whatsapp}
               target="_blank"
               rel="noreferrer"
               className="text-body-lg text-ink-300 underline decoration-strong underline-offset-8 transition-colors duration-normal ease-standard [font-variant-numeric:tabular-nums] hover:decoration-accent hover:text-ink-000"
