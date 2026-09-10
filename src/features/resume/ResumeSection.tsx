@@ -16,6 +16,8 @@ import { profile, SECTION_IDS } from '@/content';
  * the hero points at.
  */
 export function ResumeSection() {
+  const { preview } = profile.resume;
+
   return (
     <Section id={SECTION_IDS.curriculum}>
       <Reveal>
@@ -31,12 +33,28 @@ export function ResumeSection() {
           ambiguity for anyone navigating by link list. The preview names the
           document, the button names the action.
         */}
+        {/*
+          The height has to be a ratio, not a number, or the preview crops.
+
+          ResumePreview sizes its frame `{ width, height, maxWidth: '100%' }`
+          and fills it with `object-fit: cover`. On a narrow screen maxWidth
+          shrinks the width while the height stays at whatever was passed, so
+          the box grows steadily taller than the page it is showing and cover
+          takes the difference off the sides: measured at 390px, 38% of the
+          CV's width was gone — 50% at 320px. Both edges of every line.
+
+          Overriding height to `auto` and giving the frame the document's own
+          aspect ratio makes it narrow proportionally, which leaves cover with
+          nothing to crop. Applied as a style prop, since the vendored
+          component spreads `...style` last. Desktop is untouched: 560px at
+          this ratio is 725px tall, which is what was hardcoded before.
+        */}
         <ResumePreview
-          src={profile.resume.preview.src}
+          src={preview.src}
           href={profile.resume.pdf}
           width={560}
-          height={725}
           label={`${profile.name} — Resume (PDF)`}
+          style={{ height: 'auto', aspectRatio: `${preview.width} / ${preview.height}` }}
         />
 
         <Button

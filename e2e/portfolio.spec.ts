@@ -142,6 +142,31 @@ test.describe('portfolio', () => {
     await expect(email).toHaveAttribute('href', 'mailto:emmanueldev3a@gmail.com');
   });
 
+  test('shows the whole CV preview rather than a cropped strip of it', async ({ page }) => {
+    /*
+     * ResumePreview fills its frame with `object-fit: cover`, so the frame has
+     * to keep the document's own proportions or the difference is taken off
+     * the sides. It used to be given a fixed height while `maxWidth: 100%`
+     * narrowed the width, so the box grew taller than the page it was showing
+     * as the screen got smaller: measured at 38% of the CV's width gone at
+     * 390px, 50% at 320px — both margins of every line.
+     *
+     * Asserted as the crop itself rather than as a ratio, so it reads as the
+     * thing that was actually wrong, and holds at any width this runs at.
+     */
+    const preview = page.locator('#curriculum img');
+    await preview.scrollIntoViewIfNeeded();
+
+    const cropped = await preview.evaluate((el: HTMLImageElement) => {
+      const box = el.getBoundingClientRect();
+      const scale = Math.max(box.width / el.naturalWidth, box.height / el.naturalHeight);
+      return (el.naturalWidth * scale - box.width) / box.width;
+    });
+
+    // Sub-pixel rounding only.
+    expect(cropped).toBeLessThan(0.01);
+  });
+
   test('offers the phone as a WhatsApp chat, and as a readable number', async ({ page }) => {
     // Scoped to the footer: the nav carries the same contact as an icon, and
     // an unscoped match now finds both.
