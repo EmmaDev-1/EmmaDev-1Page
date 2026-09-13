@@ -204,6 +204,18 @@
     seventeen times as far. See the light theme below.
   */
   --bloom-opacity: 0.13;
+
+  /*
+    The switch's knob, and the face riding on it.
+
+    A plain tone rather than the brand gradient: the gradient is the site's
+    loudest device, and spending it on a preference control put the noisiest
+    thing on the page next to the quietest ones. The knob belongs to whichever
+    theme is on — dark here, light there — so the pair reads as a solid moving
+    over a groove instead of as a badge.
+  */
+  --toggle-knob-bg: var(--graphite-600);
+  --toggle-knob-fg: var(--ink-000);
 }
 
 /*
@@ -309,6 +321,10 @@
     recolouring the section.
   */
   --bloom-opacity: 0.06;
+
+  /* White against the chip's grey, and ink on top of it. */
+  --toggle-knob-bg: var(--surface-raised);
+  --toggle-knob-fg: var(--ink-000);
 }
 
 @layer base {
@@ -506,15 +522,15 @@
     transform: scale(var(--scale-press));
   }
 
-  /* Rides the brand gradient, and so is the one thing that does not invert. */
   .theme-toggle-knob {
     position: absolute;
     left: var(--toggle-pad);
     width: var(--toggle-knob);
     height: var(--toggle-knob);
     border-radius: var(--radius-pill);
-    background: var(--gradient-brand);
-    box-shadow: var(--glow-accent-sm);
+    background: var(--toggle-knob-bg);
+    /* An ordinary drop shadow now the glow has gone with the gradient. */
+    box-shadow: var(--shadow-sm);
     /* Dark parks it on the right, over the moon. */
     transform: translateX(var(--toggle-knob));
     transition: transform var(--dur-slow) var(--ease-settle);
@@ -547,7 +563,7 @@
   }
 
   .theme-toggle-face[data-face='moon'] {
-    color: var(--text-on-accent);
+    color: var(--toggle-knob-fg);
     opacity: 1;
     transform: scale(1) rotate(0deg);
   }
@@ -557,7 +573,7 @@
   }
 
   :root[data-theme='light'] .theme-toggle-face[data-face='sun'] {
-    color: var(--text-on-accent);
+    color: var(--toggle-knob-fg);
     opacity: 1;
     transform: scale(1) rotate(0deg);
   }

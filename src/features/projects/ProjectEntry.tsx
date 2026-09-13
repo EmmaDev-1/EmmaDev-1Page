@@ -30,6 +30,20 @@ export function ProjectEntry({ project, index }: { project: Project; index: numb
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const mediaY = useTransform(scrollYProgress, [0, 1], [36, -36]);
 
+  /*
+    A phone recording is taller than it is wide, so it never fills the column
+    it sits in: the frame around it was mostly empty inset, with the clip
+    stranded in the middle. Dropping it leaves the recording to be its own
+    shape — rounded, lifted, and no wider than itself.
+
+    Keyed on the media rather than on `category`, because the shape is what
+    makes the frame useless, not the platform. It happens to select exactly the
+    mobile projects today, every one of which is a video and every web one a
+    carousel — but a carousel is landscape and does fill the column, so it
+    keeps its frame on the strength of that rather than of its label.
+  */
+  const framed = project.media.kind !== 'video';
+
   return (
     <motion.article
       ref={ref}
@@ -49,7 +63,16 @@ export function ProjectEntry({ project, index }: { project: Project; index: numb
       >
         <motion.div style={{ y: mediaY }}>
           <motion.div
-            className="overflow-hidden rounded-md border border-hairline bg-surface-inset"
+            /*
+              Unframed, the box shrinks to the clip (`w-fit`) so the radius and
+              the shadow describe the recording itself rather than the empty
+              column around it. The lift and the glow are unchanged either way.
+            */
+            className={
+              framed
+                ? 'overflow-hidden rounded-md border border-hairline bg-surface-inset'
+                : 'mx-auto w-fit overflow-hidden rounded-md'
+            }
             animate={{
               y: hover ? -4 : 0,
               boxShadow: hover

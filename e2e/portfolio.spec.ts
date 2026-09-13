@@ -128,6 +128,46 @@ test.describe('portfolio', () => {
     }
   });
 
+  test('frames a carousel but lets a phone recording be its own shape', async ({ page }) => {
+    /*
+     * A phone recording is taller than it is wide and so never fills the
+     * column: framing it drew a box around mostly empty inset, with the clip
+     * stranded in the middle. It now shrinks to the clip, which keeps the
+     * radius and the lift while losing the panel.
+     *
+     * Measured as spare width rather than by reading classes — the thing that
+     * was wrong was the gap, and a border re-added by any other route would
+     * fail this too.
+     */
+    const measure = (id: string) =>
+      page.evaluate((target) => {
+        const media = document.querySelector(`#${target} video, #${target} img`);
+        const frame = media?.closest('div.overflow-hidden');
+        if (!media || !frame) return null;
+        const f = frame.getBoundingClientRect();
+        const m = media.getBoundingClientRect();
+        return {
+          spare: Math.round(f.width - m.width),
+          border: parseFloat(getComputedStyle(frame).borderTopWidth),
+          radius: parseFloat(getComputedStyle(frame).borderTopLeftRadius),
+        };
+      }, id);
+
+    await page.locator('#pokedex').scrollIntoViewIfNeeded();
+    const clip = await measure('pokedex');
+    expect(clip).not.toBeNull();
+    expect(clip!.spare).toBe(0);
+    expect(clip!.border).toBe(0);
+    // The corners survive the frame going: they are on the clip now.
+    expect(clip!.radius).toBeGreaterThan(0);
+
+    // A carousel is landscape, fills the column, and keeps its panel.
+    await page.locator('#casa-padi').scrollIntoViewIfNeeded();
+    const carousel = await measure('casa-padi');
+    expect(carousel).not.toBeNull();
+    expect(carousel!.border).toBeGreaterThan(0);
+  });
+
   test('offers the CV as a download', async ({ page }) => {
     const link = page.getByRole('link', { name: 'Download CV' });
     await link.scrollIntoViewIfNeeded();
