@@ -5,6 +5,7 @@ import { navItems, profile } from '@/content';
 import { SocialIconLink } from '@/components/design-system';
 import { WhatsAppIconLink } from '@/components/ui/ContactIconLink';
 import { Icon } from '@/components/ui/Icon';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { DURATION, EASE, lineMask } from '@/lib/motion';
 
 /**
@@ -125,6 +126,10 @@ export function MobileMenu({
               from exactly the readers most likely to tap it.
             */}
             <WhatsAppIconLink size={28} />
+
+            {/* Same separation as the bar's: places to go, then a control. */}
+            <span aria-hidden="true" className="mx-1 h-6 w-px bg-hairline" />
+            <ThemeToggle />
           </motion.div>
         </motion.div>
       ) : null}

@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { PRECISE_POINTER_QUERY, SCROLL_SPY_ROOT_MARGIN } from './brand';
+import { DEFAULT_THEME, isTheme, THEME_ATTR, THEME_STORAGE_KEY, type Theme } from './theme';
 
 /**
  * Tracks which section is currently in view so the nav can mark it active.
@@ -44,6 +45,88 @@ export function useScrollSpy(ids: readonly string[], fallback: string): string {
   }, [ids]);
 
   return active;
+}
+
+/**
+ * Reads and writes the active theme.
+ *
+ * The <html> attribute is the single source of truth, not React state. It is
+ * already correct before React runs — the boot script in <head> sets it — and
+ * the toggle's own appearance is driven from it in CSS, so the button looks
+ * right on a page that has not hydrated yet.
+ *
+ * That leaves this hook responsible only for the parts React must own: the
+ * accessible state, and the click. `useSyncExternalStore` is what makes the
+ * first of those safe. The page is prerendered with no reader to ask, so the
+ * server can only guess `dark`; the hook hands React that guess for hydration
+ * and the real value immediately after, which is the one thing that turns a
+ * hydration mismatch into an ordinary re-render.
+ */
+export function useTheme(): { theme: Theme; toggle: () => void } {
+  const theme = useSyncExternalStore(subscribeToTheme, readTheme, () => DEFAULT_THEME);
+
+  const toggle = useCallback(() => {
+    const next: Theme = readTheme() === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute(THEME_ATTR, next);
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, next);
+    } catch {
+      // Private modes throw on write. The theme still applies for this visit.
+    }
+  }, []);
+
+  /*
+    Follow the system only while the reader has expressed no preference of
+    their own — once they have chosen, changing it back under them would make
+    the button feel broken.
+  */
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-color-scheme: light)');
+    const update = (event: MediaQueryListEvent) => {
+      try {
+        if (isTheme(window.localStorage.getItem(THEME_STORAGE_KEY))) return;
+      } catch {
+        // Unreadable storage means no stored choice to respect.
+      }
+      document.documentElement.setAttribute(THEME_ATTR, event.matches ? 'light' : 'dark');
+    };
+
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  return { theme, toggle };
+}
+
+function readTheme(): Theme {
+  const value = document.documentElement.getAttribute(THEME_ATTR);
+  return isTheme(value) ? value : DEFAULT_THEME;
+}
+
+/**
+ * Watches the attribute rather than a React store, so every route to a theme
+ * change lands here: the toggle, the system-preference listener above, and a
+ * second tab writing to storage.
+ */
+function subscribeToTheme(onChange: () => void): () => void {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributeFilter: [THEME_ATTR] });
+  window.addEventListener('storage', mirrorThemeFromStorage);
+
+  return () => {
+    observer.disconnect();
+    window.removeEventListener('storage', mirrorThemeFromStorage);
+  };
+}
+
+/**
+ * A second tab choosing a theme applies it here too. It writes the attribute
+ * rather than notifying directly, so the change arrives through the observer
+ * above — one path in, whoever started it.
+ */
+function mirrorThemeFromStorage(event: StorageEvent): void {
+  if (event.key !== THEME_STORAGE_KEY || !isTheme(event.newValue)) return;
+  document.documentElement.setAttribute(THEME_ATTR, event.newValue);
 }
 
 /** Must stay in step with the `html[data-scroll-smooth]` rule in globals.css. */

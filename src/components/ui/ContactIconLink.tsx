@@ -49,7 +49,12 @@ export function ContactIconLink({ href, src, label, size }: Props) {
         width={size}
         height={size}
         priority
-        className="transition-[transform,filter] duration-normal ease-out-soft group-hover:scale-[var(--scale-icon-hover)] group-hover:brightness-200"
+        /*
+          The hover filter is a token because it cannot be one value:
+          brightening lifts a full-colour mark off graphite and only bleaches
+          it on paper, so the light theme dims and saturates instead.
+        */
+        className="transition-[transform,filter] duration-normal ease-out-soft group-hover:scale-[var(--scale-icon-hover)] group-hover:[filter:var(--mark-hover-filter)]"
       />
     </a>
   );

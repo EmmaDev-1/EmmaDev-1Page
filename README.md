@@ -107,6 +107,39 @@ down hides it. The desktop bar ends at 77px and the phone toggle disc at 66px, s
 clears them by 3px and 14px. Trimming it to 48/24px put the eyebrow underneath both,
 measured on the way to this value.
 
+### Theme
+
+The design system is dark by design — _"the whole system is one graphite surface; there is
+no light mode"_ — so the light theme is an addition to it rather than a setting it shipped
+with, and it is built the way every other deviation here is: as an override, never an edit.
+`globals.css` redefines the **semantic layer only**, under `:root[data-theme='light']`, and
+leaves the graphite / violet / ember ramps it points at alone. That is why the brand
+survives the switch: the accent is the same violet in both.
+
+Two things in the vendored layer had to move with it, and they move together. `--ink-000`
+turns out not to mean "white" but "the most legible text there is" — it is the hamburger's
+bars, the outline button's label, the active nav link — so it inverts. `--gradient-scrim`
+inverts with it, because the two are a pair: a caption and the wash it is legible against,
+sitting over a CV thumbnail that is a white page either way.
+
+Values were picked against measured contrast, with the dark theme's own numbers as the bar:
+muted text lands at 5.2:1 where dark manages 5.6, faint at 3.3 where dark has 3.4, and the
+accent at 4.4 where dark only reaches 3.8. Two things could not simply carry over. `ember-500`
+measures 2.7:1 on paper — under even the large-text floor, and it sits in the middle of the
+hero headline — so the gradient's middle stop deepens one step to `ember-600` at 3.7:1. And
+the hero bloom is opacity-tokenised, because the same 13% wash that shifts the dark page's
+luminance by 0.008 shifts the light page's by 0.138: seventeen times as far, which reads as
+staining rather than glowing. Light runs it at 0.06.
+
+**The switch is CSS, not React.** `data-theme` is written by a small blocking script in
+`<head>`, so it is correct before the first paint and before hydration; the toggle's knob and
+its two faces are keyed off that attribute in the stylesheet. Driving them from React state
+instead would render every light-mode reader a switch pointing at dark and then slide it
+across. React is left with the two jobs CSS cannot do — reporting `aria-checked`, via
+`useSyncExternalStore` so the prerendered guess and the real value are an ordinary re-render
+rather than a hydration mismatch, and handling the click. A stored choice outranks the system
+preference; with no stored choice the system decides, falling back to the brand's own dark.
+
 ### What this costs
 
 Every section is now a Client Component. Scroll-linked animation needs the element's own

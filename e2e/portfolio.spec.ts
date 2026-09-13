@@ -414,6 +414,90 @@ test.describe('desktop navigation', () => {
   });
 });
 
+test.describe('theme', () => {
+  /** The switch, wherever it is: the bar on desktop, the menu on a phone. */
+  async function openToggle(page: Page) {
+    await page.goto('/');
+    const inBar = page.locator('header').getByRole('switch');
+    if (await inBar.count()) return inBar;
+    await page.getByRole('button', { name: 'Open menu' }).click();
+    return page.getByTestId('mobile-menu').getByRole('switch');
+  }
+
+  test.describe('with a light system preference', () => {
+    test.use({ colorScheme: 'light' });
+
+    test('never shows a dark page to a reader who asked for light', async ({ page }) => {
+      /*
+       * Two halves, because neither proves it alone.
+       *
+       * The served markup has to resolve the theme before the body begins, so
+       * there is nothing painted for a flash to happen in. Asserting that in
+       * the raw HTML is exact, where sampling the live DOM is a race: the
+       * earliest a test can look is already later than the browser's own
+       * first opportunity to paint.
+       */
+      const html = await (await page.request.get('/')).text();
+      const bodyStarts = html.indexOf('<body');
+      expect(bodyStarts).toBeGreaterThan(-1);
+      expect(html.indexOf('data-theme')).toBeGreaterThan(-1);
+      expect(html.indexOf('data-theme')).toBeLessThan(bodyStarts);
+
+      /*
+       * And once running it must stay put — a theme that resolves early and
+       * is then corrected by a component after hydration flashes just as badly.
+       */
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      const seen = new Set<string | null>();
+      for (let i = 0; i < 8; i += 1) {
+        seen.add(await page.evaluate(() => document.documentElement.getAttribute('data-theme')));
+        await page.waitForTimeout(60);
+      }
+      expect([...seen]).toEqual(['light']);
+    });
+
+    test('reports itself as on, and starts light', async ({ page }) => {
+      const toggle = await openToggle(page);
+      await expect(toggle).toHaveAttribute('aria-checked', 'true');
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    });
+  });
+
+  test.describe('with a dark system preference', () => {
+    test.use({ colorScheme: 'dark' });
+
+    test('starts dark, and says so', async ({ page }) => {
+      const toggle = await openToggle(page);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      await expect(toggle).toHaveAttribute('aria-checked', 'false');
+    });
+
+    test('switches the palette, not just the attribute', async ({ page }) => {
+      const toggle = await openToggle(page);
+      const readBg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+
+      const dark = await readBg();
+      await toggle.click();
+
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+      await expect(toggle).toHaveAttribute('aria-checked', 'true');
+      // The whole point: the tokens moved, so the page is genuinely repainted.
+      expect(await readBg()).not.toBe(dark);
+    });
+
+    test('remembers the choice across a reload', async ({ page }) => {
+      // A stored choice has to outrank the system preference, which here still
+      // says dark — otherwise the button appears to do nothing on the next visit.
+      const toggle = await openToggle(page);
+      await toggle.click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+      await page.reload({ waitUntil: 'commit' });
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    });
+  });
+});
+
 test.describe('the URL follows the reader', () => {
   test('writes the section being read without a click', async ({ page }) => {
     await page.goto('/');

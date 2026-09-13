@@ -164,11 +164,151 @@
   --media-max-height: 560px;
   --rail-card-width: min(85vw, 360px);
 
+  /*
+    Theme toggle geometry. The knob is exactly one face wide and travels
+    exactly its own width, so the two ends are the two icons rather than two
+    approximations of them: pad + knob + knob + pad is the whole track.
+  */
+  --toggle-knob: 24px;
+  --toggle-pad: 4px;
+  --toggle-track-w: calc(var(--toggle-knob) * 2 + var(--toggle-pad) * 2);
+  --toggle-track-h: calc(var(--toggle-knob) + var(--toggle-pad) * 2);
+
   /* Career timeline geometry. See .timeline-* below. */
   --timeline-gutter: 160px;
   --timeline-node: 15px;
   /* Centres a 1px rail under the node: (node − rail) / 2. */
   --timeline-rail-offset: 7px;
+
+  /*
+    Transparent endpoints for the bar's scroll transition.
+
+    Motion interpolates colour channel by channel, so animating to a bare
+    `transparent` (which is rgba(0,0,0,0)) drags a translucent black through
+    the midpoint. These carry the theme's own colour at zero alpha, so the
+    fade is only ever a fade.
+  */
+  --surface-glass-clear: rgba(21, 21, 21, 0);
+  --border-hairline-clear: rgba(255, 255, 255, 0);
+
+  /*
+    What a hover does to a full-colour brand mark. Brightening lifts a logo off
+    a dark ground; on a light one it only washes it out, so light dims instead.
+  */
+  --mark-hover-filter: brightness(2);
+
+  /*
+    How strongly the hero bloom reads. It cannot be one number: the same wash
+    that barely lifts black visibly stains paper — measured, the 0.13 that
+    shifts the dark page's luminance by 0.008 shifts the light page's by 0.138,
+    seventeen times as far. See the light theme below.
+  */
+  --bloom-opacity: 0.13;
+}
+
+/*
+  ================= Light theme =================
+
+  The design system is dark by design — "the whole system is one graphite
+  surface" — so this is an addition to it, not a setting it shipped with. It
+  overrides only the semantic layer, never the graphite/violet/ember ramps
+  those aliases point at, which is why the brand survives the switch: the
+  accent is the same violet in both themes.
+
+  Unlayered and attribute-scoped, so it beats the vendored `:root` on
+  specificity rather than on order, the same way the font re-binding above
+  does. `data-theme` is written before first paint — see app/layout.tsx.
+
+  Every value here was picked against measured contrast, not by eye, and the
+  bar was the dark theme's own: muted text sits at 5.2:1 where dark is 5.6,
+  faint at 3.3 where dark is 3.4, and the accent at 4.4 where dark manages
+  only 3.8.
+*/
+:root[data-theme='light'] {
+  /*
+    The ink ramp inverts. It has to: the vendored components read --ink-000 as
+    "the most legible text there is" — it is the hamburger's bars, the outline
+    button's label, the active nav link — so leaving it white would erase all
+    three. Each step is matched to the contrast its dark counterpart carries
+    rather than to its lightness.
+  */
+  --ink-000: #111114;
+  --ink-100: #2a2a31;
+  --ink-200: #4d4d57;
+  --ink-300: #66666f;
+  --ink-400: #85858e;
+
+  /*
+    Surfaces keep their elevation logic rather than mirroring their lightness:
+    what is raised is still nearer white, what is inset is still nearer the
+    page. A white card on a faintly grey page reads as lifted; the same card
+    inverted would read as a hole.
+  */
+  --bg-page: #f4f4f6;
+  --bg-page-deep: #e7e7ea;
+  --surface-raised: #ffffff;
+  --surface-card: #ffffff;
+  /*
+    A white card cannot get lighter on hover, so it warms toward the accent
+    instead of greying — grey would read as the card going stale rather than
+    as it answering the pointer.
+  */
+  --surface-card-hover: #faf6fc;
+  --surface-inset: #ebebee;
+  --surface-chip: #e9e9ed;
+  --surface-chip-hover: #dcdce2;
+  /* Still a dark scrim: an overlay's job is to push content back, either way. */
+  --surface-overlay: rgba(17, 17, 20, 0.45);
+  --surface-glass: rgba(244, 244, 246, 0.72);
+  --surface-glass-clear: rgba(244, 244, 246, 0);
+
+  /* The hairlines are white at low alpha in the dark. Here they are ink. */
+  --border-hairline: rgba(17, 17, 20, 0.1);
+  --border-subtle: rgba(17, 17, 20, 0.16);
+  --border-strong: rgba(17, 17, 20, 0.28);
+  --border-hairline-clear: rgba(17, 17, 20, 0);
+
+  /* violet-400 is a highlight against graphite and a ghost against paper. */
+  --focus-ring: var(--violet-700);
+
+  /*
+    The dark theme's shadows run to 70% and 100% black — the weight it takes to
+    read as depth against graphite. The same values on paper look like soot.
+  */
+  --shadow-sm: 0 2px 8px rgba(17, 17, 20, 0.08);
+  --shadow-md: 0 10px 20px rgba(17, 17, 20, 0.1);
+  --shadow-lg: 0 15px 30px rgba(17, 17, 20, 0.14);
+  --shadow-portrait: 10px 10px 15px rgba(17, 17, 20, 0.18);
+
+  /*
+    The scrim flips with --ink-000, and has to: the two are a pair, a caption
+    and the wash it is legible against. It sits over the CV thumbnail, which is
+    a white page, so ink on a pale wash is as readable there as white on a dark
+    one was.
+  */
+  --gradient-scrim: linear-gradient(180deg, rgba(244, 244, 246, 0), rgba(244, 244, 246, 0.94));
+
+  /*
+    The gradient's middle stop deepens by one step. ember-500 measures 2.7:1 on
+    this background — under even the large-text floor — and it lands in the
+    middle of the hero headline. ember-600 clears it at 3.7:1 and is close
+    enough that the two themes read as the same gradient.
+  */
+  --gradient-brand: linear-gradient(to right, #a945c7, #e04a22, #ae4fca);
+  --gradient-brand-vertical: linear-gradient(#a945c7, #e04a22, #ae4fca);
+  --gradient-brand-wide: linear-gradient(100deg, #a945c7, #e04a22, #ae4fca, #a945c7);
+  --accent-secondary: var(--ember-600);
+
+  --mark-hover-filter: brightness(0.72) saturate(1.25);
+
+  /*
+    Cut to keep the bloom a tint rather than a wash. Matching the dark theme's
+    measured deviation exactly would mean an opacity near 0.008 — invisible,
+    and the bloom is meant to be seen. This lands at a chroma of 7 against the
+    page's 2, which reads as brand colour in the corner of the eye without
+    recolouring the section.
+  */
+  --bloom-opacity: 0.06;
 }
 
 @layer base {
@@ -327,6 +467,107 @@
     }
   }
 
+  /*
+    Theme toggle.
+
+    In CSS rather than in Motion, and that is the whole design. The theme is
+    known before React is — the boot script sets it in <head> — so keying the
+    knob and the two faces off `[data-theme]` means the switch is already in
+    the right position on the first paint, on a page that has not hydrated.
+    Driving it from React state instead would render every light-mode reader a
+    switch pointing at dark, then slide it across once hydration caught up.
+
+    Reduced motion needs nothing here: the universal rule above collapses every
+    transition on the page, these included.
+  */
+  .theme-toggle {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    width: var(--toggle-track-w);
+    height: var(--toggle-track-h);
+    padding: var(--toggle-pad);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    background: var(--surface-chip);
+    cursor: pointer;
+    transition:
+      background-color var(--dur-normal) var(--ease-standard),
+      border-color var(--dur-normal) var(--ease-standard);
+  }
+
+  .theme-toggle:hover {
+    background: var(--surface-chip-hover);
+    border-color: var(--border-strong);
+  }
+
+  .theme-toggle:active {
+    transform: scale(var(--scale-press));
+  }
+
+  /* Rides the brand gradient, and so is the one thing that does not invert. */
+  .theme-toggle-knob {
+    position: absolute;
+    left: var(--toggle-pad);
+    width: var(--toggle-knob);
+    height: var(--toggle-knob);
+    border-radius: var(--radius-pill);
+    background: var(--gradient-brand);
+    box-shadow: var(--glow-accent-sm);
+    /* Dark parks it on the right, over the moon. */
+    transform: translateX(var(--toggle-knob));
+    transition: transform var(--dur-slow) var(--ease-settle);
+  }
+
+  .theme-toggle-face {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--toggle-knob);
+    height: var(--toggle-knob);
+    transition:
+      color var(--dur-normal) var(--ease-standard),
+      opacity var(--dur-normal) var(--ease-standard),
+      transform var(--dur-slow) var(--ease-settle);
+  }
+
+  /*
+    The dormant face tilts away and gives up a little size; the lit one snaps
+    upright at full scale on the knob. Same easing as the slide, so the three
+    movements read as one gesture rather than three that happen to coincide.
+  */
+  .theme-toggle-face[data-face='sun'] {
+    color: var(--text-muted);
+    opacity: 0.7;
+    transform: scale(0.8) rotate(-50deg);
+  }
+
+  .theme-toggle-face[data-face='moon'] {
+    color: var(--text-on-accent);
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  :root[data-theme='light'] .theme-toggle-knob {
+    transform: translateX(0);
+  }
+
+  :root[data-theme='light'] .theme-toggle-face[data-face='sun'] {
+    color: var(--text-on-accent);
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  :root[data-theme='light'] .theme-toggle-face[data-face='moon'] {
+    color: var(--text-muted);
+    opacity: 0.7;
+    transform: scale(0.8) rotate(50deg);
+  }
+
   /* The one background event the system allows: a soft brand bloom. */
   .bloom-hero {
     position: absolute;
@@ -335,7 +576,7 @@
     height: 70vh;
     pointer-events: none;
     background: var(--gradient-brand-wide);
-    opacity: 0.13;
+    opacity: var(--bloom-opacity);
     filter: blur(120px);
     z-index: 0;
   }

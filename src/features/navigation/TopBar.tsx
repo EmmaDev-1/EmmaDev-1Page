@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import { NavLink, SocialIconLink } from '@/components/design-system';
 import { WhatsAppIconLink } from '@/components/ui/ContactIconLink';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { navItems, profile } from '@/content';
 import { BLUR_NONE } from '@/lib/brand';
 import { DURATION, EASE } from '@/lib/motion';
@@ -26,9 +27,15 @@ export function TopBar({ activeHref, condensed }: { activeHref: string; condense
     <motion.header
       className="flex items-center justify-between gap-6 px-12 py-4"
       animate={{
-        backgroundColor: condensed ? 'var(--surface-glass)' : 'rgba(21, 21, 21, 0)',
+        /*
+          The cleared endpoints are tokens, not literals, and theme-aware:
+          Motion interpolates colour channel by channel, so fading from a
+          transparent graphite to a light glass would drag grey through the
+          middle of the transition on the light theme.
+        */
+        backgroundColor: condensed ? 'var(--surface-glass)' : 'var(--surface-glass-clear)',
         backdropFilter: condensed ? 'blur(var(--blur-glass))' : BLUR_NONE,
-        borderBottomColor: condensed ? 'var(--border-hairline)' : 'rgba(255, 255, 255, 0)',
+        borderBottomColor: condensed ? 'var(--border-hairline)' : 'var(--border-hairline-clear)',
       }}
       transition={{ duration: DURATION.slow, ease: EASE.standard }}
       style={{ borderBottomWidth: 1, borderBottomStyle: 'solid' }}
@@ -61,6 +68,14 @@ export function TopBar({ activeHref, condensed }: { activeHref: string; condense
         ))}
 
         <WhatsAppIconLink size={26} />
+
+        {/*
+          After the marks, with a rule between: those three go somewhere, this
+          changes the page you are on. Grouping it with them would suggest it
+          is a fourth place to find him.
+        */}
+        <span aria-hidden="true" className="mx-1 h-5 w-px bg-hairline" />
+        <ThemeToggle />
       </div>
     </motion.header>
   );

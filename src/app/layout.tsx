@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Varela_Round } from 'next/font/google';
 import { MotionProvider } from '@/components/motion/MotionProvider';
 import { profile } from '@/content';
-import { BRAND_GRAPHITE } from '@/lib/brand';
+import { BRAND_GRAPHITE, BRAND_PAPER } from '@/lib/brand';
 import { SITE_URL } from '@/lib/site';
+import { themeBootScript } from '@/lib/theme';
 import '@/styles/globals.css';
 
 /**
@@ -62,14 +63,43 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // The whole system is one graphite surface; there is no light mode.
-  themeColor: BRAND_GRAPHITE,
-  colorScheme: 'dark',
+  /*
+    Two values, matched on the system preference rather than on the reader's
+    stored choice — a meta tag cannot see localStorage. It is therefore right
+    for anyone who has not overridden their system, and one shade out for
+    anyone who has; the alternative is being wrong for everyone on light.
+  */
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: BRAND_GRAPHITE },
+    { media: '(prefers-color-scheme: light)', color: BRAND_PAPER },
+  ],
+  // Both, now that there are two: this is what themes the scrollbar and any
+  // form control the browser draws itself.
+  colorScheme: 'light dark',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${varelaRound.variable} ${jetbrainsMono.variable}`}>
+    /*
+      suppressHydrationWarning because the boot script below adds `data-theme`
+      to this element before React reaches it. The warning would be correct —
+      the served markup really does differ from what React expects — and
+      wrong to act on, since that difference is the entire point.
+    */
+    <html
+      lang="en"
+      className={`${varelaRound.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/*
+          Blocking, inline, and before anything paints. The page is prerendered
+          with no idea who is reading it, so the theme can only be resolved
+          here; resolving it in a component would show every light-mode reader
+          a black page first and then take it away.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body>
         <MotionProvider>{children}</MotionProvider>
       </body>

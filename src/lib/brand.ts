@@ -22,8 +22,16 @@
  * These MUST stay in step with src/styles/design-system/tokens/colors.css.
  */
 
-/** --graphite-150, the single page background. */
+/** --graphite-150, the dark theme's page background. */
 export const BRAND_GRAPHITE = '#151515';
+
+/**
+ * The light theme's page background — `--bg-page` under `[data-theme='light']`
+ * in globals.css, and only there. It is not a design-system token: the system
+ * ships no light surface, so this is the one colour of that theme the browser
+ * chrome needs and the only place it can be stated as a literal.
+ */
+export const BRAND_PAPER = '#f4f4f6';
 
 /** --violet-700, the brand purple. */
 export const BRAND_VIOLET = '#a945c7';

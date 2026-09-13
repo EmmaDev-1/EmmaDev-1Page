@@ -5,7 +5,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Moon,
   Play,
+  Sun,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -41,6 +43,9 @@ const ICONS = {
   download: Download,
   play: Play,
   close: X,
+  /** The two faces of the theme toggle, and nothing else. */
+  sun: Sun,
+  moon: Moon,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;
