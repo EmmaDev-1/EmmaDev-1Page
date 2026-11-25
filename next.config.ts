@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { UMAMI_CLOUD_SCRIPT_URL, UMAMI_SCRIPT_PATH } from './src/lib/analytics';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -14,6 +15,26 @@ const nextConfig: NextConfig = {
 
   // The site is a single static page — no dynamic data, no runtime secrets.
   poweredByHeader: false,
+
+  /**
+   * The analytics tracker, served from this origin instead of Umami Cloud's.
+   *
+   * Half of the proxy; the other half is `src/app/api/send/route.ts`, which
+   * carries the beacon and has to be a function because it rewrites headers.
+   * This half is a plain `GET` of an unchanged file, so a rewrite is the whole
+   * job — and better than a function would be, since Vercel's CDN serves it
+   * and the upstream's own cache headers survive.
+   *
+   * Returned bare rather than under `beforeFiles`: nothing exists at this path
+   * on disk, so letting the filesystem look first costs nothing and keeps the
+   * rewrite from shadowing a real file added here later.
+   *
+   * `lib/analytics.ts` holds both ends of the mapping, so the path in the
+   * script tag and the path matched here cannot drift apart.
+   */
+  async rewrites() {
+    return [{ source: UMAMI_SCRIPT_PATH, destination: UMAMI_CLOUD_SCRIPT_URL }];
+  },
 
   async headers() {
     return [

@@ -38,14 +38,15 @@ The app runs at <http://localhost:3000>.
 ```
 src/
 ├── app/                     Routing, metadata, OG image, sitemap, robots
+│   └── api/send/            Analytics beacon proxy (the one runtime route)
 ├── components/
 │   ├── design-system/       VENDORED — do not hand-edit
 │   │   └── index.ts         The only sanctioned import path
 │   ├── motion/              Reveal, Stagger, LineReveal, MotionProvider
-│   └── ui/                  Icon, Section, ProjectMedia, PersonJsonLd
+│   └── ui/                  Icon, Section, ProjectMedia, PersonJsonLd, UmamiAnalytics
 ├── features/                One directory per page section, plus navigation
 ├── content/                 Typed content + Zod schemas
-├── lib/                     motion.ts (DS motion vocabulary), hooks, brand
+├── lib/                     motion.ts (DS motion vocabulary), hooks, brand, analytics
 └── styles/                  Tokens, Tailwind theme bridge, globals
 ```
 
@@ -139,6 +140,78 @@ across. React is left with the two jobs CSS cannot do — reporting `aria-checke
 `useSyncExternalStore` so the prerendered guess and the real value are an ordinary re-render
 rather than a hydration mismatch, and handling the click. A stored choice outranks the system
 preference; with no stored choice the system decides, falling back to the brand's own dark.
+
+### Analytics
+
+**Umami Cloud**, on its free tier: 100k events a month, one site, **six months of retention**.
+That last number is why it is not Vercel Web Analytics, which is one package and zero
+configuration but keeps **one month** of history on the Hobby plan. A portfolio's traffic is not a
+baseline, it is a handful of spikes — a post goes out, a CV is sent, a recruiter opens the link —
+and the useful question months later is which of them worked. One month of retention cannot answer
+it, and the data no longer exists to go back for. Cloudflare Web Analytics offers unlimited traffic
+and the weakest of the three dashboards; the ceiling was never going to bind on a personal site, so
+it was the wrong thing to optimise for. Umami is also MIT-licensed, so if the hosted tier changes
+the same schema can be self-hosted and the history migrated.
+
+**Both halves of it are proxied through this origin**, which is the only part of this that is
+non-obvious. Umami's own instructions are two third-party requests — a script from
+`cloud.umami.is`, a beacon to `gateway.umami.is` — and those cost exactly what the Google Fonts CDN
+cost before `next/font` replaced it: a DNS lookup and a TLS handshake to a host nothing else on the
+page needs. A tracker is also the first request a content blocker drops, and `gateway.umami.is` is
+on the public blocklists by name. Served from here, both are ordinary first-party requests.
+
+It is two mechanisms, because the two halves need different things:
+
+- **The script** is a `rewrite` in `next.config.ts`, mapping `/stats/script.js` to Umami Cloud's
+  copy. A `GET` of an unchanged file needs nothing more, and a rewrite is better than a function
+  would be — Vercel's CDN serves it and the upstream's cache headers survive.
+- **The beacon** is `src/app/api/send/route.ts`, and has to be a function because the forwarded
+  request is assembled by hand. Umami Cloud reads country and city from the IP that reaches the
+  gateway, which behind a proxy is the proxy's; the route forwards the visitor's. It also forwards
+  the user agent, without which Umami's API docs say the hit is not registered at all, and the
+  tracker's own `x-umami-*` headers, which are not in the body — Umami's documented Express proxy
+  example forwards the first two and drops the third.
+
+**`data-host-url` is a single slash, and that is deliberate.** The shipped tracker builds its
+collect URL as `` `${(hostUrl || 'https://gateway.umami.is').replace(/\/$/, '')}/api/send` `` —
+read out of `cloud.umami.is/script.js` rather than inferred from the docs — so `/` collapses to the
+relative path `/api/send`, which resolves against whichever origin served the page. The obvious
+alternative, an absolute URL from `SITE_URL`, pins the beacon to the domain known at build time: on
+the day a custom domain is added without `NEXT_PUBLIC_SITE_URL` being updated with it, that beacon
+becomes a cross-origin `POST` to the old host, the preflight finds no CORS headers on our route,
+and analytics stops recording with nothing anywhere saying so. The relative path is same-origin on
+production, on a preview URL and on localhost, with nothing to keep in sync.
+
+`data-domains` is deliberately absent for the same reason — it pins a hostname at build time, and
+the environment scoping below already does its job.
+
+**The page is still fully static.** `/api/send` is the only route that runs on a request, and it is
+reached only by the tracker. Nothing on the page waits for it.
+
+**Only production builds track.** `UmamiAnalytics` renders no element at all unless
+`VERCEL_ENV` is `production`, which is what keeps `pnpm dev`, a local `pnpm start`, the test suite
+and preview deployments out of the dashboard without a flag to remember.
+
+**The website id is committed, in `lib/analytics.ts`, not set in the dashboard.** It is not a
+secret — it ships in the HTML of every page — and this repo already prefers committed configuration
+to remembered configuration; it is why `vercel.json` exists. A dashboard variable is one more thing
+that can be missing on a fresh project or scoped to the wrong environment, and both mistakes fail
+silently, as an empty dashboard that looks like nobody visited. The trade is that a fork deployed to
+its own Vercel production would report here; for a personal portfolio that is noise, filterable by
+hostname in Umami.
+
+Umami's onboarding hands out a ready-made `<script>` snippet. It does **not** go in this repo — it
+points at `cloud.umami.is` and would undo the proxy. The only part of it this repo uses is the
+`data-website-id`.
+
+The tracker sets no cookies and writes nothing to `localStorage`, so there is no consent banner to
+add.
+
+One thing to check after a production deploy, because it is the part no test can cover: open the
+site, and confirm in the network panel that a `POST` goes to `/api/send` on this domain and comes
+back `200`, and that the visit lands in Umami with the right **country**. A hit that records with
+the country missing or wrong means the visitor IP is not reaching the gateway, which is the one
+failure mode of the proxy.
 
 ### What this costs
 
@@ -301,7 +374,7 @@ one-line change in `src/content/` if wanted:
 
 ## Deployment
 
-Built for **Vercel** — every route prerenders, but `next/image` optimisation still wants a runtime
+Built for **Vercel** — every page prerenders, but `next/image` optimisation still wants a runtime
 optimiser.
 
 `vercel.json` pins the framework preset, install command and build command. That matters here

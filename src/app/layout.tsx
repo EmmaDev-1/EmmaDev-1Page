@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Varela_Round } from 'next/font/google';
 import { MotionProvider } from '@/components/motion/MotionProvider';
+import { UmamiAnalytics } from '@/components/ui/UmamiAnalytics';
 import { profile } from '@/content';
 import { BRAND_GRAPHITE, BRAND_PAPER } from '@/lib/brand';
 import { SITE_URL } from '@/lib/site';
@@ -99,6 +100,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           a black page first and then take it away.
         */}
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        {/*
+          After the theme script, which is the only thing on the page allowed
+          to block paint. Renders nothing unless a website id is configured.
+        */}
+        <UmamiAnalytics />
       </head>
       <body>
         <MotionProvider>{children}</MotionProvider>
